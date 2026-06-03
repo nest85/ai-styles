@@ -1,0 +1,231 @@
+<!--
+================================================================
+DeepThink Style 模板 · report-css.html
+AI Output Styles
+================================================================
+
+给 AI 的使用规则（渲染前必须阅读并严格遵守）
+
+一、这是什么
+  本文件是 DeepThink 风格的 HTML 模板。DOCTYPE 之后的部分是一个可以
+  直接在浏览器打开的真实示例，演示了本风格的全部组件。模板编辑者可在
+  本地直接修改并预览。
+
+二、如何用它渲染用户内容
+  1. 以本文件为基础，只把 main 区域里的示例内容替换成用户的真实内容，
+     并按示例里出现过的组件来组织（章节、色块、表格、标签、卡片组等）。
+  2. 同时把页面标题换成用户内容的标题。
+  3. main 以外的部分（head、页面骨架、脚本）原样保留，不要改动。
+
+三、样式与单文件输出
+  1. 样式在同目录的 deepthink.css，本地预览时由页面里的样式链接自动加载。
+  2. 生成最终交付文件时，把 deepthink.css 的全部内容原样内联进页面顶部的
+     样式区，并去掉那条外部样式链接，使产物成为自包含的单个 HTML 文件。
+  3. 内联时复制 css 原文，不要重写、不要精简。
+  4. 若 deepthink.css 取不到，停止生成并提示用户，不要自行编造样式或更换风格。
+
+四、保真原则（契约，必须遵守）
+  DeepThink 是视觉风格，不是内容编辑器。只换皮，不改肉。
+  1. 用户原文 1:1 出现在输出中，不删除、不改写、不压缩、不摘要，连标点也不改。
+  2. 仅允许添加结构性元信息：章节标题、表头、组件标签。
+  3. 离散清单才用表格或卡片组；连续叙述、排比、反问要用普通段落承载，
+     不要拆成表格行或卡片，以免被迫改写衔接词。
+  4. 色块里放的必须是用户原文里已存在的句子，不要自己提炼新句子塞进去。
+  5. 数字必须是原文出现过的，不要推算或编造。
+================================================================
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>这里是大标题XXXXXX</title>
+<link rel="stylesheet" href="deepthink.css">
+</head>
+<body>
+
+<!-- 桌面侧边目录（JS 自动填充） -->
+<aside class="toc-side" id="toc-side">
+  <div class="toc-label">目录</div>
+  <ol id="toc-side-list"></ol>
+</aside>
+
+<main>
+
+  <header class="doc-header">
+    <div class="eyebrow">这里是眉标 XXXX</div>
+    <h1>这里是大标题XXXXXX</h1>
+    <p style="font-size:17px;color:var(--ink-mid);margin:8px 0 0;">这里是副标题，这是什么什么什么的一句话摘要。</p>
+    <div class="doc-meta">
+      <div class="row"><span class="key">这是字段</span><span class="val">这是取值 XXXX</span></div>
+      <div class="row"><span class="key">这是字段</span><span class="val">这是取值 XXXX</span></div>
+    </div>
+  </header>
+
+  <!-- 移动内联目录（JS 自动填充） -->
+  <nav class="toc-inline" id="toc-inline">
+    <div class="toc-label">目录</div>
+    <ol id="toc-inline-list"></ol>
+  </nav>
+
+  <section id="s1">
+    <h2>这里是一级标题XXXX</h2>
+    <p>这是正文段落，这是什么什么什么，这是什么什么什么，这是什么什么什么。这是什么什么什么，这是什么什么什么。</p>
+    <p>这是另一段正文，里面有 <strong>这是强调文字</strong>、<em>这是斜体文字</em>，还有 <a href="#">这是一条链接</a>。这是什么什么什么。</p>
+    <h3>这里是二级标题XXX</h3>
+    <p>这是正文段落，这是什么什么什么，这是什么什么什么。</p>
+    <ul>
+      <li>这是无序列表项，这是什么什么什么</li>
+      <li>这是无序列表项，这是什么什么什么</li>
+      <li>这是无序列表项，这是什么什么什么</li>
+    </ul>
+    <h4>这里是三级标题XX</h4>
+    <blockquote>这是引用块，这是什么什么什么，这是什么什么什么。</blockquote>
+    <p>这是带行内代码的正文：<code>这是代码</code>，这是什么什么什么。</p>
+  </section>
+
+  <section id="s2">
+    <h2>这里是一级标题XXXX（色块组件）</h2>
+
+    <div class="block-green">
+      <div class="block-label">这是绿色标签</div>
+      <p class="block-text">这是绿色结论块的核心一句，这是什么什么什么。</p>
+      <p>这是补充说明文字，这是什么什么什么，这是什么什么什么。</p>
+      <div class="block-support">这是支持来源一、这是支持来源二</div>
+    </div>
+
+    <div class="block-amber">
+      <div class="block-label">这是琥珀标签</div>
+      <p>这是琥珀警示块，这是什么什么什么，这是什么什么什么。</p>
+      <span class="meta-label">这是小标签</span>
+      <p>这是琥珀块里的补充说明，这是什么什么什么。</p>
+    </div>
+
+    <div class="block-dark">
+      <div class="block-label">这是约束标签</div>
+      <div class="block-text">这是深绿约束块的核心一句，这是什么什么什么。</div>
+      <p><strong>为什么：</strong>这是原因说明，这是什么什么什么。</p>
+    </div>
+
+    <div class="block-quote" data-label="这是批注标签">
+      这是引用批注块，这是什么什么什么，这是什么什么什么。
+    </div>
+  </section>
+
+  <section id="s3">
+    <h2>这里是一级标题XXXX（标签与指标）</h2>
+    <p>
+      这是标签示例：
+      <span class="tag tag-green">这是绿标</span>
+      <span class="tag tag-amber">这是琥珀标</span>
+      <span class="tag tag-blue">这是蓝标</span>
+      <span class="tag tag-gray">这是灰标</span>
+    </p>
+    <div class="stat-display">
+      <span class="stat-number">88%</span>
+      <span class="stat-label">这是指标说明 XXXX</span>
+    </div>
+    <div class="stat-bar">
+      <div class="stat-bar-fill" style="width: 88%"></div>
+    </div>
+  </section>
+
+  <section id="s4">
+    <h2>这里是一级标题XXXX（卡片组）</h2>
+    <div class="action-grid">
+      <div class="action-card">
+        <div class="action-term">这是卡片标题一</div>
+        <ol>
+          <li>这是条目，这是什么什么什么</li>
+          <li>这是条目，这是什么什么什么</li>
+        </ol>
+      </div>
+      <div class="action-card">
+        <div class="action-term">这是卡片标题二</div>
+        <ol>
+          <li>这是条目，这是什么什么什么</li>
+          <li>这是条目，这是什么什么什么</li>
+        </ol>
+      </div>
+      <div class="action-card">
+        <div class="action-term">这是卡片标题三</div>
+        <ol>
+          <li>这是条目，这是什么什么什么</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section id="s5">
+    <h2>这里是一级标题XXXX（表格）</h2>
+    <table>
+      <thead>
+        <tr><th>这是表头一</th><th>这是表头二</th><th>这是表头三</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>这是单元格</td>
+          <td>这是单元格，这是什么什么什么</td>
+          <td><span class="tag tag-gray">这是标</span></td>
+        </tr>
+        <tr>
+          <td>这是单元格</td>
+          <td>这是单元格，这是什么什么什么</td>
+          <td><span class="tag tag-green">这是标</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <footer class="doc-footer">
+    这是页脚，这是什么什么什么 · <a href="https://github.com/nest85/ai-output-styles/tree/main/styles/deepthink" target="_blank">DeepThink Style</a> · <a href="https://github.com/nest85/ai-output-styles" target="_blank">AI Output Styles</a>
+  </footer>
+
+</main>
+
+<script>
+  // 自动目录：读取所有 section[id]，取第一个 h2 作为条目
+  (function () {
+    var sections = document.querySelectorAll('section[id]');
+    if (sections.length === 0) return;
+
+    var sideList   = document.getElementById('toc-side-list');
+    var inlineList = document.getElementById('toc-inline-list');
+
+    sections.forEach(function (sec) {
+      var h2 = sec.querySelector('h2');
+      if (!h2) return;
+      var text = h2.textContent.trim();
+      var id   = sec.id;
+
+      [sideList, inlineList].forEach(function (list) {
+        var li = document.createElement('li');
+        var a  = document.createElement('a');
+        a.href        = '#' + id;
+        a.textContent = text;
+        li.appendChild(a);
+        list.appendChild(li);
+      });
+    });
+
+    var sideItems = sideList ? sideList.querySelectorAll('li') : [];
+    function onScroll() {
+      var scrollY = window.scrollY + 80;
+      var current = 0;
+      sections.forEach(function (sec, i) {
+        if (sec.offsetTop <= scrollY) current = i;
+      });
+      sideItems.forEach(function (li, i) {
+        li.classList.toggle('active', i === current);
+      });
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    sections.forEach(function (sec) {
+      sec.style.scrollMarginTop = '32px';
+    });
+  })();
+</script>
+</body>
+</html>
