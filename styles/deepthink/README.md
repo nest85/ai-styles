@@ -1,6 +1,6 @@
 # DeepThink Style
 
-> AI Output Style — 风格套件 · v1.0
+> AI Style — 风格套件 · v1.0
 
 ---
 
@@ -18,7 +18,7 @@
 
 ```
 请使用 DeepThink 风格（读取下面的 README，按其中说明加载模板）：
-https://raw.githubusercontent.com/nest85/ai-output-styles/main/styles/deepthink/README.md
+https://raw.githubusercontent.com/nest85/ai-styles/main/styles/deepthink/README.md
  
 把以下内容用这套风格渲染：
 [你的 AI 输出内容]
@@ -30,7 +30,7 @@ https://raw.githubusercontent.com/nest85/ai-output-styles/main/styles/deepthink/
 AI注意：
 1. 存在多个模板，而用户未指定模板时，列出选项提醒用户选择。
 2. 需加载文件先从本地目录找；
-   找不到则用 https://raw.githubusercontent.com/nest85/ai-output-styles/main/styles/deepthink/ + 需加载文件 查找；
+   找不到则用 https://raw.githubusercontent.com/nest85/ai-styles/main/styles/deepthink/ + 需加载文件 查找；
    只要有任一需加载文件最终找不到，就停止生成，并告诉用户缺哪个文件； 不要自行编造样式或用其它风格替代。
 
 | 模板名称              | 适合场景                     | 需加载文件                   | 渲染依赖            |

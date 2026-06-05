@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- ============================================================
+  本文件是「示例风格（AI Styles）」HTML 渲染模板。渲染前先读完本注释（头部注释）。
+
+  任务：在遵循以下说明的前提下，用本模板渲染用户提供的内容，输出一份完整的 HTML 文件。
+
+  一、自定义元素标记系统
+
+  1. 自定义元素
+    用 HTML 自定义属性把普通元素标记为本模板的自定义元素，格式 data-as-*="name"：
+    data- 是 HTML 对自定义属性的要求，as- 是 AI Styles 项目的命名空间，name 是元素的身份标记，
+    name 在本模板内必须唯一，但输出的 HTML 中 name 可重复。
+    渲染时这些元素各有功能特性。本模板的自定义元素：
+      · 槽 Slot        = 用 data-as-slot="name" 标记，是 AI 填充内容的容器；位置固定。
+      · 组件 Component = 用 data-as-component="name" 标记，是 AI 填进槽的积木；可重复使用。
+
+  2. 自定义元素的注释
+    用 @as-* 标记的注释是本模板约定写法（如 @as-slot、@as-component），是 AI 操作该元素的说明书。
+    元素与注释靠 name 对应——同名即绑定，被标记的元素即具备该注释描述的功能：
+      · 标了 data-as-slot="name" 的元素，对应 @as-slot name 的注释；
+      · 标了 data-as-component="name" 的元素，对应 @as-component name 的注释。
+
+    注释字段（写在注释里、name 之后；未在此声明的字段对 AI 无效）：
+      · 槽  ：描述 / 填充（文本 = 只换文字 ｜ 组件 = 用组件搭）。
+      · 组件：描述 / 布局（块 ｜ 行内）/ 适用（何时用）/ 禁止（何时别用）。
+
+    装配说明：
+      本模板实际有哪些槽和组件、各自的描述/适用/禁止、以及哪个是默认组件（模板中仅限唯一），都写在模板中对应的 @as-slot / @as-component 注释里，渲染前一并读取。
+      · 槽  ：
+        先依据各槽的“描述”判断该填用户的哪部分内容；
+        再按“填充”方式填（填充=文本，表示换掉里面的文字；填充=组件，表示清空示例，用组件搭）。
+      · 组件：
+        根据用户的内容按各组件的“适用/禁止”选用，不靠外观；拿不准就用默认组件。
+        只能使用本模板已声明（带 data-as-component）的组件，不得自创或使用未声明的组件。
+        复用组件时照抄它的写法，只换里面的文字。
+      · 未标记的元素 = 冻结：原样照搬，绝不改、不移、不删。
+
+  二、保真硬约束
+    · 用户原文 1:1 搬入，绝不改写、不增删、不润色、不重排。
+    · 绝不自创样式或组件；模板里没有合适的，就退回用默认组件。
+
+  三、输出与交付
+    · 输出完整、可直接打开的 HTML（从 <!DOCTYPE html> 到 </html>）；本模板内所有未改动（包含冻结）的部分一律原样保留，绝不省略。
+    · 删除：本头部注释，以及所有 @as-slot / @as-component 注释。
+    · 保留：data-as-slot / data-as-component 属性。
+============================================================ -->
+
+<!-- @as-slot title
+  描述: 页面标题
+  填充: 文本
+-->
+<title data-as-slot="title">示例文档标题</title>
+
+<style>
+  :root{
+    --paper:#faf7f1;
+    --ink:#23201b;
+    --ink-soft:#5f584c;
+    --accent:#2f6b4f;
+    --accent-soft:#e9f1ec;
+    --amber:#8a5a00;
+    --amber-soft:#faf1dd;
+    --rule:#e7e1d5;
+    --code-bg:#f2eee5;
+    --mono:'SF Mono',ui-monospace,'Cascadia Code',Menlo,Consolas,monospace;
+    --serif:'Songti SC','STSong','Source Han Serif SC','Noto Serif CJK SC',serif;
+    --sans:'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Source Han Sans SC','Noto Sans CJK SC',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{
+    font-family:var(--sans);
+    font-size:16px;line-height:1.85;
+    color:var(--ink);background:var(--paper);
+    max-width:760px;margin:0 auto;padding:64px 28px 96px;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* 标题 */
+  h1{font-family:var(--serif);font-size:2.15em;line-height:1.3;margin:0 0 .2em;font-weight:600;letter-spacing:.01em}
+  h2{font-family:var(--serif);font-size:1.5em;margin:2.2em 0 .7em;font-weight:600;padding-bottom:.25em;border-bottom:2px solid var(--accent);display:inline-block}
+  h3{font-family:var(--serif);font-size:1.2em;margin:1.8em 0 .5em;font-weight:600;color:var(--accent)}
+
+  /* 正文基础 */
+  p{margin:1.05em 0}
+  strong{font-weight:600;color:#000}
+  a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent);padding-bottom:1px}
+  a:hover{background:var(--accent-soft)}
+  hr{border:0;height:1px;background:var(--rule);margin:2.4em 0}
+  ul,ol{margin:1.05em 0;padding-left:1.4em}
+  li{margin:.35em 0}
+  ul{list-style:none}
+  ul li{position:relative}
+  ul li::before{content:'—';position:absolute;left:-1.4em;color:var(--accent)}
+
+  /* 引用 */
+  blockquote{font-family:var(--serif);font-style:italic;font-size:1.08em;color:var(--ink-soft);
+    margin:1.6em 0;padding:.2em 0 .2em 1.2em;border-left:3px solid var(--accent)}
+
+  /* 代码 */
+  code{font-family:var(--mono);font-size:.88em;background:var(--code-bg);padding:.12em .4em;border-radius:4px}
+  pre{font-family:var(--mono);font-size:.86em;line-height:1.6;background:var(--code-bg);
+    padding:16px 18px;border-radius:8px;overflow:auto;margin:1.4em 0;border:1px solid var(--rule)}
+  pre code{background:none;padding:0}
+
+  /* 图片 */
+  figure{margin:1.8em 0;text-align:center}
+  figure img{max-width:100%;border-radius:8px;border:1px solid var(--rule)}
+  figcaption{font-size:.85em;color:var(--ink-soft);margin-top:.6em}
+
+  /* 表格 */
+  table{width:100%;border-collapse:collapse;margin:1.6em 0;font-size:.95em}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule)}
+  th{font-weight:600;border-bottom:2px solid var(--ink);background:rgba(0,0,0,.02)}
+  tr:last-child td{border-bottom:1px solid var(--ink)}
+
+  /* 信息块 callout */
+  .callout{margin:1.5em 0;padding:14px 18px;border-radius:8px;border-left:4px solid}
+  .callout .label{font-weight:600;font-size:.82em;letter-spacing:.06em;margin-bottom:.35em;text-transform:uppercase}
+  .callout p{margin:.3em 0}
+  .callout-info{background:var(--accent-soft);border-color:var(--accent)}
+  .callout-info .label{color:var(--accent)}
+  .callout-warning{background:var(--amber-soft);border-color:var(--amber)}
+  .callout-warning .label{color:var(--amber)}
+  .conclusion{background:var(--accent-soft);border-color:var(--accent);border-left-width:4px}
+  .conclusion .label{color:var(--accent)}
+
+  /* 标签 */
+  .tag{display:inline-block;font-size:.78em;font-weight:600;padding:2px 9px;border-radius:11px;vertical-align:middle}
+  .tag-done{background:var(--accent-soft);color:var(--accent)}
+  .tag-doing{background:var(--amber-soft);color:var(--amber)}
+  .tag-fail{background:#fbe6e3;color:#b3261e}
+
+  /* 浮动目录（冻结脚手架，勿改） */
+  .as-toc{position:fixed;top:64px;left:calc(50% - 600px);width:190px;
+    max-height:calc(100vh - 128px);overflow:auto;font-size:.82em;line-height:1.5;padding-right:10px}
+  .as-toc-title{font-weight:600;color:var(--ink-soft);text-transform:uppercase;
+    letter-spacing:.1em;font-size:.78em;margin-bottom:.7em}
+  .as-toc a{display:block;color:var(--ink-soft);text-decoration:none;border:0;
+    padding:3px 0 3px 11px;border-left:2px solid transparent;border-radius:0}
+  .as-toc a:hover{color:var(--accent);background:none}
+  .as-toc a.as-toc-h3{padding-left:24px;font-size:.95em}
+  .as-toc a.active{color:var(--accent);border-left-color:var(--accent);font-weight:600}
+  @media (max-width:1200px){.as-toc{display:none}}
+
+  footer{margin-top:4em;padding-top:1.4em;border-top:1px solid var(--rule);
+    color:var(--ink-soft);font-size:.85em}
+</style>
+</head>
+<body>
+
+<nav class="as-toc"></nav>
+
+<!-- @as-slot heading
+  描述: 文章大标题
+  填充: 文本
+-->
+<h1 data-as-slot="heading">示例文档标题</h1>
+
+<!-- @as-slot body
+  描述: 正文主体区
+  填充: 组件
+-->
+<div data-as-slot="body">
+
+  <!-- ============================================================
+       ↓↓ 组件清单 ↓↓
+       每个组件 = 一段多行 @as-component 说明 + 一个真实示例。
+       这整片同时是 body 槽的示例内容，渲染时被用户内容替换。
+       ============================================================ -->
+
+  <!-- ———————————— 正文基础 ———————————— -->
+
+  <!-- @as-component p
+    描述: 段落（默认组件）
+    布局: 块
+    适用: 普通叙述、过渡、说明；拿不准用什么时的默认选择
+    禁止: —
+  -->
+  <p data-as-component="p">这是一个普通段落，承载大部分叙述性文字。当一段内容不属于任何特殊类型时，就用它——它是最安全的默认选择。</p>
+
+  <!-- @as-component strong
+    描述: 强调
+    布局: 行内
+    适用: 句子里需要加重的关键词
+    禁止: 整段加粗；不要用来代替标题
+  -->
+  <p>有些词需要<strong data-as-component="strong">重点强调</strong>，让读者一眼抓住。</p>
+
+  <!-- @as-component link
+    描述: 链接
+    布局: 行内
+    适用: 指向外部资源或站内位置的文字
+    禁止: 把整句话都做成链接
+  -->
+  <p>更多说明见<a href="https://example.com" data-as-component="link">这篇参考文档</a>。</p>
+
+  <!-- @as-component code-inline
+    描述: 行内代码
+    布局: 行内
+    适用: 句子中的变量名、命令、文件名、短代码
+    禁止: 多行代码(那用代码块)
+  -->
+  <p>运行 <code data-as-component="code-inline">npm install</code> 即可安装依赖。</p>
+
+  <!-- @as-component tag-done
+    描述: 完成标签（绿）
+    布局: 行内
+    适用: 表示已完成、通过、正向状态的小标记
+    禁止: 当正文段落用；非正向状态改用其它颜色标签
+  -->
+  <p>状态：<span class="tag tag-done" data-as-component="tag-done">完成</span></p>
+
+  <!-- @as-component tag-doing
+    描述: 进行中标签（琥珀）
+    布局: 行内
+    适用: 表示进行中、待处理、需注意状态的小标记
+    禁止: 当正文段落用；其它状态改用对应颜色标签
+  -->
+  <p>状态：<span class="tag tag-doing" data-as-component="tag-doing">进行中</span></p>
+
+  <!-- @as-component tag-fail
+    描述: 失败标签（红）
+    布局: 行内
+    适用: 表示失败、未通过、负向状态的小标记
+    禁止: 当正文段落用；其它状态改用对应颜色标签
+  -->
+  <p>状态：<span class="tag tag-fail" data-as-component="tag-fail">失败</span></p>
+
+  <!-- ———————————— 结构 ———————————— -->
+
+  <!-- @as-component h2
+    描述: 二级标题
+    布局: 块
+    适用: 文章主要分节的标题
+    禁止: 用于强调一句话(那用 strong)
+  -->
+  <h2 data-as-component="h2">一个主要章节</h2>
+
+  <!-- @as-component h3
+    描述: 三级标题
+    布局: 块
+    适用: 章节内部的小节标题
+    禁止: 跳级使用(没有 h2 就直接 h3)
+  -->
+  <h3 data-as-component="h3">章节里的一个小节</h3>
+
+  <!-- @as-component list-bulleted
+    描述: 无序列表
+    布局: 块
+    适用: 并列、无先后的若干要点
+    禁止: 有明确步骤顺序时(那用有序列表)
+  -->
+  <ul data-as-component="list-bulleted">
+    <li>并列要点之一</li>
+    <li>并列要点之二</li>
+    <li>并列要点之三</li>
+  </ul>
+
+  <!-- @as-component list-numbered
+    描述: 有序列表
+    布局: 块
+    适用: 有先后/步骤/排名的条目
+    禁止: 条目之间没有顺序关系时
+  -->
+  <ol data-as-component="list-numbered">
+    <li>第一步</li>
+    <li>第二步</li>
+    <li>第三步</li>
+  </ol>
+
+  <!-- @as-component hr
+    描述: 分隔线
+    布局: 块
+    适用: 表示话题的明显转折或段落分隔
+    禁止: 频繁使用当装饰
+  -->
+  <hr data-as-component="hr">
+
+  <!-- ———————————— 块内容 ———————————— -->
+
+  <!-- @as-component blockquote
+    描述: 引用
+    布局: 块
+    适用: 引述他人原话、文献、金句
+    禁止: 包裹自己写的正文充当样式
+  -->
+  <blockquote data-as-component="blockquote">把被引用的原话原样放在这里，注意保留出处。</blockquote>
+
+  <!-- @as-component code-block
+    描述: 代码块
+    布局: 块
+    适用: 多行代码、命令序列、配置片段
+    禁止: 句中的单个变量名(那用行内代码)
+  -->
+  <pre data-as-component="code-block"><code>function hello(name) {
+  return `你好, ${name}`;
+}</code></pre>
+
+  <!-- @as-component figure
+    描述: 图片
+    布局: 块
+    适用: 配图、截图、示意图；把 src 换成真实图片，alt/图注照实写
+    禁止: 纯装饰且无信息的图
+  -->
+  <figure data-as-component="figure">
+    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='300'%3E%3Crect width='100%25' height='100%25' fill='%23ece7dd'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='22' fill='%23a89f8d' text-anchor='middle' dominant-baseline='middle'%3E示例图片（把 src 换成真实图）%3C/text%3E%3C/svg%3E" alt="示例图片的替代文字">
+    <figcaption>图 1：这里写图注，说明图片内容。</figcaption>
+  </figure>
+
+  <!-- @as-component table
+    描述: 表格
+    布局: 块
+    适用: 行列对照的数据、清单、对比
+    禁止: 连续叙述性文字
+  -->
+  <table data-as-component="table">
+    <thead>
+      <tr><th>项目</th><th>说明</th><th>状态</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>条目 A</td><td>对应的说明文字</td><td><span class="tag tag-done">完成</span></td></tr>
+      <tr><td>条目 B</td><td>对应的说明文字</td><td><span class="tag tag-doing">进行中</span></td></tr>
+    </tbody>
+  </table>
+
+  <!-- ———————————— 信息块 ———————————— -->
+
+  <!-- @as-component callout-info
+    描述: 提示块
+    布局: 块
+    适用: 补充说明、提示、值得注意但非警示的信息
+    禁止: 普通正文(那用 p)
+  -->
+  <div class="callout callout-info" data-as-component="callout-info">
+    <div class="label">提示</div>
+    <p>把需要单独提示的信息放这里。</p>
+  </div>
+
+  <!-- @as-component callout-warning
+    描述: 警告块
+    布局: 块
+    适用: 风险、注意事项、容易出错的地方
+    禁止: 用于一般信息(那用提示块)
+  -->
+  <div class="callout callout-warning" data-as-component="callout-warning">
+    <div class="label">注意</div>
+    <p>把风险或警示内容放这里。</p>
+  </div>
+
+  <!-- @as-component conclusion
+    描述: 结论块
+    布局: 块
+    适用: 包裹原文里一句已存在的关键结论 / 正向判断
+    禁止: 自己提炼一句新结论塞进去
+  -->
+  <div class="callout conclusion" data-as-component="conclusion">
+    <div class="label">核心结论</div>
+    <p>把原文中那句结论原样放进来，不要改写。</p>
+  </div>
+
+</div>
+
+<footer>本页脚没有任何标记，属于冻结区，AI 原样保留、不会改动。</footer>
+
+<!-- 浮动目录：从正文 h2/h3 自动生成（原生 JS，无依赖） -->
+<script>
+(function () {
+  function build() {
+    try {
+      var body = document.querySelector('[data-as-slot="body"]') || document.body;
+      var heads = body.querySelectorAll('h2, h3');
+      var toc = document.querySelector('.as-toc');
+      // 自保护：容器缺失则自动创建
+      if (!toc) {
+        toc = document.createElement('nav');
+        toc.className = 'as-toc';
+        document.body.appendChild(toc);
+      }
+      // 无标题：隐藏目录，优雅退出
+      if (!heads.length) { toc.style.display = 'none'; return; }
+
+      toc.innerHTML = '<div class="as-toc-title">目录</div>';
+      var links = [];
+      heads.forEach(function (h, i) {
+        if (!h.id) { h.id = 'sec-' + (i + 1); }   // 自动补 id，AI 无需手写
+        var a = document.createElement('a');
+        a.href = '#' + h.id;
+        a.textContent = h.textContent;
+        if (h.tagName.toLowerCase() === 'h3') { a.className = 'as-toc-h3'; }
+        a.addEventListener('click', function (e) {
+          e.preventDefault();
+          h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          history.replaceState(null, '', '#' + h.id);
+        });
+        toc.appendChild(a);
+        links.push({ a: a, el: h });
+      });
+
+      // 滚动高亮当前小节（scroll-spy）
+      function onScroll() {
+        var pos = window.scrollY + 100, cur = links[0];
+        links.forEach(function (l) { if (l.el.offsetTop <= pos) { cur = l; } });
+        links.forEach(function (l) { l.a.classList.toggle('active', l === cur); });
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    } catch (err) {
+      /* 出错也不影响正文阅读：渐进增强 */
+    }
+  }
+  if (document.readyState !== 'loading') { build(); }
+  else { document.addEventListener('DOMContentLoaded', build); }
+})();
+</script>
+
+</body>
+</html>

@@ -1,11 +1,11 @@
 ---
-name: ai-output-styles
+name: as
 description: AI 输出风格路由器——定位风格、加载模板、按指定风格渲染输出。不创造内容，只改变呈现方式。
 ---
 
-# AI Output Styles (AOS)
+# AI Styles (AS)
 
-AOS 是一个**输出风格路由器**。它不管内容，只管把内容送进正确的风格流水线。
+AS 是一个**输出风格路由器**。它不管内容，只管把内容送进正确的风格流水线。
 
 ---
 
@@ -14,26 +14,26 @@ AOS 是一个**输出风格路由器**。它不管内容，只管把内容送进
 调用方式：
 
 ```
-/ai-output-styles [style] [template1] [template2] ...
+/as [style] [template1] [template2] ...
 ```
 
 ### 参数解析流程
 
 ```
-/ai-output-styles
+/as
   → 无参数：扫描 styles/ 展示风格列表，询问用户选哪个
 
-/ai-output-styles [style]
+/as [style]
   → 有 style，无 template：
     → 读取 styles/[style]/README.md 获取模板清单
     → 只有1个模板：直接使用，开始渲染
     → 有多个模板：列出模板清单，询问用户选哪个（或选多个）
     → 没有模板：提醒用户该风格无可用模板，结束
 
-/ai-output-styles [style] [template]
+/as [style] [template]
   → 有 style + template：直接加载 styles/[style]/templates/[template:需加载文件] 开始渲染
 
-/ai-output-styles [style] [template1] [template2] ...
+/as [style] [template1] [template2] ...
   → 有 style + 多个 template：依次加载各模板，同一份内容分别渲染
 ```
 
@@ -57,7 +57,7 @@ AOS 是一个**输出风格路由器**。它不管内容，只管把内容送进
 
 ```
 styles/
-├── aos/          ← AOS 通用风格
+├── base/          ← AI Styles 官方风格
 ├── deepthink/    ← DeepThink 深度分析风格
 └── <style>/      ← 未来新增风格
 ```
@@ -81,7 +81,7 @@ styles/
 ```
 
 需加载文件优先从本地目录找；找不到再用远程 URL（
-`https://raw.githubusercontent.com/nest85/ai-output-styles/main/styles/<style>/`），用到的远程风格下载保存到本地 /styles。
+`https://raw.githubusercontent.com/nest85/ai-styles/main/styles/<style>/`），用到的远程风格下载保存到本地 /styles。
 
 多模板时，同一份内容分别送入每个模板，独立渲染，互不依赖，不共享上下文。
 

@@ -1,6 +1,6 @@
-# AI Output Styles
+# AI Styles
 
-> AI 输出风格库，让 Claude、ChatGPT、Gemini 等 AI 的输出拥有统一、专业、可复用的视觉风格。
+> AI 风格库，让 Claude、ChatGPT、Gemini 等 AI 的输出拥有统一、专业、可复用的视觉风格。
 
 ## 项目简介
 
@@ -11,11 +11,11 @@
 * 不适合直接汇报或交付
 * 风格难以复用
 
-AI Output Styles 希望解决的是 **AI 输出风格标准化与美化** 问题。
+AI Styles 希望解决的是 **AI 输出风格标准化与美化** 问题。
 
 ## 核心理念
 
-AI Output Styles 不创造内容。 它只改变内容的呈现方式。你可以理解为：
+AI Styles 不创造内容。 它只改变内容的呈现方式。你可以理解为：
 > AI 输出领域的风格库（Style Library）。
 
 * 保留原始事实
@@ -73,7 +73,7 @@ your-style/
 
   安装为 Claude Code/OpenClaw/Codex Skill，在 Agent 中调用。例如：
     ```text
-    /ai-output-styles 用deepthink风格输出以上内容
+    /as 用deepthink风格输出以上内容
     ```
 
 ---

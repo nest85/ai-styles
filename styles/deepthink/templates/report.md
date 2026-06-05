@@ -1,8 +1,8 @@
 <!--
 
 ================================================================
-DeepThink Style Kit — report.md
-AI Output StyleKit v1.0
+DeepThink Style — report.md
+AI Style v1.0
 ================================================================
 
 【AI 使用说明】
