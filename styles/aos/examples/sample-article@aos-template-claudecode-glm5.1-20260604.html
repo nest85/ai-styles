@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title data-aos-slot="title">构建你的第一个个人知识库</title>
+
+<style>
+  :root{
+    --paper:#faf7f1;
+    --ink:#23201b;
+    --ink-soft:#5f584c;
+    --accent:#2f6b4f;
+    --accent-soft:#e9f1ec;
+    --amber:#8a5a00;
+    --amber-soft:#faf1dd;
+    --rule:#e7e1d5;
+    --code-bg:#f2eee5;
+    --mono:'SF Mono',ui-monospace,'Cascadia Code',Menlo,Consolas,monospace;
+    --serif:'Songti SC','STSong','Source Han Serif SC','Noto Serif CJK SC',serif;
+    --sans:'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Source Han Sans SC','Noto Sans CJK SC',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{
+    font-family:var(--sans);
+    font-size:16px;line-height:1.85;
+    color:var(--ink);background:var(--paper);
+    max-width:760px;margin:0 auto;padding:64px 28px 96px;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* 标题 */
+  h1{font-family:var(--serif);font-size:2.15em;line-height:1.3;margin:0 0 .2em;font-weight:600;letter-spacing:.01em}
+  h2{font-family:var(--serif);font-size:1.5em;margin:2.2em 0 .7em;font-weight:600;padding-bottom:.25em;border-bottom:2px solid var(--accent);display:inline-block}
+  h3{font-family:var(--serif);font-size:1.2em;margin:1.8em 0 .5em;font-weight:600;color:var(--accent)}
+
+  /* 正文基础 */
+  p{margin:1.05em 0}
+  strong{font-weight:600;color:#000}
+  a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent);padding-bottom:1px}
+  a:hover{background:var(--accent-soft)}
+  hr{border:0;height:1px;background:var(--rule);margin:2.4em 0}
+  ul,ol{margin:1.05em 0;padding-left:1.4em}
+  li{margin:.35em 0}
+  ul{list-style:none}
+  ul li{position:relative}
+  ul li::before{content:'—';position:absolute;left:-1.4em;color:var(--accent)}
+
+  /* 引用 */
+  blockquote{font-family:var(--serif);font-style:italic;font-size:1.08em;color:var(--ink-soft);
+    margin:1.6em 0;padding:.2em 0 .2em 1.2em;border-left:3px solid var(--accent)}
+
+  /* 代码 */
+  code{font-family:var(--mono);font-size:.88em;background:var(--code-bg);padding:.12em .4em;border-radius:4px}
+  pre{font-family:var(--mono);font-size:.86em;line-height:1.6;background:var(--code-bg);
+    padding:16px 18px;border-radius:8px;overflow:auto;margin:1.4em 0;border:1px solid var(--rule)}
+  pre code{background:none;padding:0}
+
+  /* 图片 */
+  figure{margin:1.8em 0;text-align:center}
+  figure img{max-width:100%;border-radius:8px;border:1px solid var(--rule)}
+  figcaption{font-size:.85em;color:var(--ink-soft);margin-top:.6em}
+
+  /* 表格 */
+  table{width:100%;border-collapse:collapse;margin:1.6em 0;font-size:.95em}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule)}
+  th{font-weight:600;border-bottom:2px solid var(--ink);background:rgba(0,0,0,.02)}
+  tr:last-child td{border-bottom:1px solid var(--ink)}
+
+  /* 信息块 callout */
+  .callout{margin:1.5em 0;padding:14px 18px;border-radius:8px;border-left:4px solid}
+  .callout .label{font-weight:600;font-size:.82em;letter-spacing:.06em;margin-bottom:.35em;text-transform:uppercase}
+  .callout p{margin:.3em 0}
+  .callout-info{background:var(--accent-soft);border-color:var(--accent)}
+  .callout-info .label{color:var(--accent)}
+  .callout-warning{background:var(--amber-soft);border-color:var(--amber)}
+  .callout-warning .label{color:var(--amber)}
+  .conclusion{background:var(--accent-soft);border-color:var(--accent);border-left-width:4px}
+  .conclusion .label{color:var(--accent)}
+
+  /* 标签 */
+  .tag{display:inline-block;font-size:.78em;font-weight:600;padding:2px 9px;border-radius:11px;
+    background:var(--accent-soft);color:var(--accent);vertical-align:middle}
+
+  /* 浮动目录（冻结脚手架，勿改） */
+  .aos-toc{position:fixed;top:64px;left:calc(50% - 600px);width:190px;
+    max-height:calc(100vh - 128px);overflow:auto;font-size:.82em;line-height:1.5;padding-right:10px}
+  .aos-toc-title{font-weight:600;color:var(--ink-soft);text-transform:uppercase;
+    letter-spacing:.1em;font-size:.78em;margin-bottom:.7em}
+  .aos-toc a{display:block;color:var(--ink-soft);text-decoration:none;border:0;
+    padding:3px 0 3px 11px;border-left:2px solid transparent;border-radius:0}
+  .aos-toc a:hover{color:var(--accent);background:none}
+  .aos-toc a.aos-toc-h3{padding-left:24px;font-size:.95em}
+  .aos-toc a.active{color:var(--accent);border-left-color:var(--accent);font-weight:600}
+  @media (max-width:1200px){.aos-toc{display:none}}
+
+  footer{margin-top:4em;padding-top:1.4em;border-top:1px solid var(--rule);
+    color:var(--ink-soft);font-size:.85em}
+</style>
+</head>
+<body>
+
+<!-- 浮动目录：冻结脚手架，勿动。脚本会从 body 槽的 h2/h3 自动填充；若此容器被删，脚本会自动重建。 -->
+<nav class="aos-toc"></nav>
+
+<h1 data-aos-slot="heading">构建你的第一个个人知识库</h1>
+
+<div data-aos-slot="body">
+
+  <p data-aos-component="p">在信息过载的时代，一个<strong data-aos-component="strong">个人知识库</strong>能把零散的笔记、链接和想法沉淀成可复用的资产。本文用最小的步骤带你搭起第一个知识库，并指出几个常见的坑。完整的工具清单可参考<a href="https://example.com/tools" data-aos-component="link">这份在线对照表</a>。</p>
+
+  <h2 data-aos-component="h2">为什么要有知识库</h2>
+
+  <p data-aos-component="p">我们每天接触的信息远多于能消化的。问题不在于看得太少，而在于看过就忘、用时找不到。</p>
+
+  <blockquote data-aos-component="blockquote">我们淹没在信息里，却渴求着知识。<br>—— 约翰·奈斯比特</blockquote>
+
+  <p data-aos-component="p">知识库要解决的，正是从“看过”到“能用”这一步。</p>
+
+  <h3 data-aos-component="h3">三个核心原则</h3>
+
+  <ul data-aos-component="list-bulleted">
+    <li><strong data-aos-component="strong">单一入口</strong>：所有新笔记先进同一个收件箱，定期整理，避免散落各处。</li>
+    <li><strong data-aos-component="strong">原子化</strong>：一条笔记只讲一件事，方便日后重组与引用。</li>
+    <li><strong data-aos-component="strong">双向链接</strong>：让笔记彼此引用，逐渐长成一张网络，而不是一堆孤岛。</li>
+  </ul>
+
+  <h2 data-aos-component="h2">动手搭建</h2>
+
+  <p data-aos-component="p">只需要三步就能开始：</p>
+
+  <ol data-aos-component="list-numbered">
+    <li>选一个工具（下表对比了三款常见选择）。</li>
+    <li>建立目录结构，把 <code data-aos-component="code-inline">inbox/</code>、<code data-aos-component="code-inline">notes/</code>、<code data-aos-component="code-inline">archive/</code> 分开。</li>
+    <li>写下第一条笔记，并给它打上标签。</li>
+  </ol>
+
+  <p data-aos-component="p">下面是三款工具的简单对比：</p>
+
+  <table data-aos-component="table">
+    <thead>
+      <tr><th>工具</th><th>适合人群</th><th>价格</th><th>状态</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Obsidian</td><td>喜欢本地存储与 Markdown</td><td>免费</td><td><span class="tag" data-aos-component="tag">稳定</span></td></tr>
+      <tr><td>Notion</td><td>需要团队协作</td><td>免费起</td><td><span class="tag" data-aos-component="tag">稳定</span></td></tr>
+      <tr><td>自建 Wiki</td><td>喜欢折腾、要完全掌控</td><td>视部署而定</td><td><span class="tag" data-aos-component="tag">测试中</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-info" data-aos-component="callout-info">
+    <div class="label">提示</div>
+    <p>先别纠结选哪个工具。任何能让你<strong data-aos-component="strong">马上开始记</strong>的工具，都是好工具。</p>
+  </div>
+
+  <p data-aos-component="p">目录结构可以这样组织：</p>
+
+  <pre data-aos-component="code-block"><code>knowledge-base/
+├── inbox/        # 待整理的临时笔记
+├── notes/        # 已整理的原子笔记
+└── archive/      # 不再活跃但需保留的内容</code></pre>
+
+  <p data-aos-component="p">新建一条笔记时，用 <code data-aos-component="code-inline">touch notes/my-first-note.md</code> 就能快速创建一个空文件，然后开始写。</p>
+
+  <figure data-aos-component="figure">
+    <img src="https://img-nos.yiyouliao.com/alph/0ffa7945fe42bcb055b354897057b31a.jpeg" alt="知识库工作流：收集 → 整理 → 链接 → 复用">
+    <figcaption>图 1：知识在“收集—整理—链接—复用”四个环节中持续流动。</figcaption>
+  </figure>
+
+  <h2 data-aos-component="h2">常见误区</h2>
+
+  <div class="callout callout-warning" data-aos-component="callout-warning">
+    <div class="label">注意</div>
+    <p>不要一上来就追求完美的分类体系。<strong data-aos-component="strong">过度分类</strong>会让你花在整理上的时间，超过真正用于思考的时间。</p>
+  </div>
+
+  <p data-aos-component="p">另一个常见问题是只存不用：收藏了大量资料却从不回看。知识库的复利来自<strong data-aos-component="strong">反复使用</strong>，而不是不断囤积。</p>
+
+  <hr data-aos-component="hr">
+
+  <h2 data-aos-component="h2">小结</h2>
+
+  <p data-aos-component="p">搭建知识库的门槛其实很低：选个工具、分三个文件夹、写下第一条笔记，你就已经开始了。难的是长期坚持，让记录、链接和复用成为习惯。</p>
+
+  <div class="callout conclusion" data-aos-component="conclusion">
+    <div class="label">核心结论</div>
+    <p>知识库的价值不在工具多强，而在于你<strong data-aos-component="strong">持续地记录、链接并复用</strong>——开始并坚持，远比一开始就选对工具重要。</p>
+  </div>
+
+</div>
+
+<footer>本页脚没有任何标记，属于冻结区，AI 原样保留、不会改动。</footer>
+
+<!-- 浮动目录脚本：冻结脚手架，请勿改动。原生 JS，无依赖，渐进增强。 -->
+<script>
+(function () {
+  function build() {
+    try {
+      var body = document.querySelector('[data-aos-slot="body"]') || document.body;
+      var heads = body.querySelectorAll('h2, h3');
+      var toc = document.querySelector('.aos-toc');
+      // 自保护：容器缺失则自动创建
+      if (!toc) {
+        toc = document.createElement('nav');
+        toc.className = 'aos-toc';
+        document.body.appendChild(toc);
+      }
+      // 无标题：隐藏目录，优雅退出
+      if (!heads.length) { toc.style.display = 'none'; return; }
+
+      toc.innerHTML = '<div class="aos-toc-title">目录</div>';
+      var links = [];
+      heads.forEach(function (h, i) {
+        if (!h.id) { h.id = 'sec-' + (i + 1); }   // 自动补 id，AI 无需手写
+        var a = document.createElement('a');
+        a.href = '#' + h.id;
+        a.textContent = h.textContent;
+        if (h.tagName.toLowerCase() === 'h3') { a.className = 'aos-toc-h3'; }
+        a.addEventListener('click', function (e) {
+          e.preventDefault();
+          h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          history.replaceState(null, '', '#' + h.id);
+        });
+        toc.appendChild(a);
+        links.push({ a: a, el: h });
+      });
+
+      // 滚动高亮当前小节（scroll-spy）
+      function onScroll() {
+        var pos = window.scrollY + 100, cur = links[0];
+        links.forEach(function (l) { if (l.el.offsetTop <= pos) { cur = l; } });
+        links.forEach(function (l) { l.a.classList.toggle('active', l === cur); });
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    } catch (err) {
+      /* 出错也不影响正文阅读：渐进增强 */
+    }
+  }
+  if (document.readyState !== 'loading') { build(); }
+  else { document.addEventListener('DOMContentLoaded', build); }
+})();
+</script>
+
+</body>
+</html>
