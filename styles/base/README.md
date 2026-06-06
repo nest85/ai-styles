@@ -37,5 +37,6 @@ AI注意：
 | html    | 可视化 / 可打印 PDF / 浏览器分享    | templates/as.html           | 浏览器             |
 | aoshtml | 可视化 / 可打印 PDF / 浏览器分享    | templates/aos-template.html | 浏览器             |
 | md      | 文档站 / 邮件 / 纯文本归档 / PR 描述 | templates/as.md             | 任意 Markdown 渲染器 |
+| ppt     | 网页 PPT / 演示 / 翻页幻灯片 / 可打印 PDF | templates/ppt.html          | 浏览器             |
 
 **默认模板：** html

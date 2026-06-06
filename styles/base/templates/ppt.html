@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- ============================================================
+  本文件是「示例风格（AI Styles）」PPT 渲染模板。渲染前先读完本注释（头部注释）。
+
+  任务：在遵循以下说明的前提下，用本模板把用户提供的内容渲染成一份「单页、可翻页、可播放」的网页 PPT，输出完整 HTML 文件。
+
+  一、自定义元素标记协议
+
+  1. 自定义元素
+    用 HTML 自定义属性把普通元素标记为本模板的自定义元素，格式 data-as-*="name"：
+    data- 是 HTML 对自定义属性的要求，as- 是 AI Styles 项目的命名空间，name 是元素的身份标记，
+    name 在本模板内必须唯一，但输出的 HTML 中 name 可重复。
+    本模板的自定义元素：
+      · 槽 Slot        = 用 data-as-slot="name" 标记，是 AI 填充内容的容器；位置固定。
+      · 组件 Component = 用 data-as-component="name" 标记，是 AI 填进槽的积木；可重复使用。
+
+  2. 自定义元素的注释
+    用 @as-* 标记的注释是本模板约定写法（如 @as-slot、@as-component），是 AI 操作该元素的说明书。
+    元素与注释靠 name 对应——同名即绑定。
+    注释字段：
+      · 槽  ：描述 / 填充（文本 = 只换文字 ｜ 组件 = 用组件搭）。
+      · 组件：描述 / 布局（块）/ 适用（何时用）/ 禁止（何时别用）。
+
+  3. 自定义元素装配说明
+    · 槽  ：根据描述判断该填哪部分内容；按填充方式填。
+    · 组件：根据用户内容按「适用/禁止」选用；
+            仅使用模板已声明（data-as-component）的组件，禁止自创；
+            无法确定时用默认组件 slide-content；
+            复用组件时保持结构不变；
+            允许修改组件正常使用所必需的内容和属性；
+            除此之外不得增删标签、class、style、data-* 属性。
+    · 未标记的元素 = 冻结：原样照搬，绝不改、不移、不删（特别是底部控制条 .ppt-ctrl 与 <script>，那是 PPT 引擎，动了就翻不动页）。
+
+  二、PPT 渲染规则（本模板特有）
+
+  1. 一张 slide = 一个组件 = 一屏。不要把多页内容塞进同一个 slide-content。
+  2. 每张 slide 的内容应能在一屏内显示完；正文太长就拆成多张 slide-content。
+  3. slide-content 内部允许直接使用原生 HTML 标签承载文本：
+       <p> <ul> <ol> <li> <blockquote> <pre> <code> <strong> <em> <a>
+     无需为这些行内/段落元素再加 data-as-component 标记（这是 ppt 模板的特例，比 as.html 更轻）。
+  4. 页面顺序 = DOM 顺序。第一张通常是 slide-cover，最后一张通常是 slide-end，中间按内容组织。
+
+  三、拆页原则（防止过度拆页）
+
+  · slide-section（绿底章节分隔页）仅在演示 ≥ 10 页时使用；短演示直接用 slide-content 标题即可。
+  · 不要为原文导语/前言/小结自创独立页；那些是上下文连续段落，并入相邻内容页。
+  · 估算原则：原文 1 个 h2 ≈ 1–3 张 slide-content；正文不到 800 字时整份演示 ≤ 8 页。
+
+  四、步进动画（fragment）—— 可选
+
+  · 在 slide-content / slide-two-col 内部，给元素加 class="fragment" 表示「按一次 → 才出现」。
+    例：<li class="fragment">要点二</li>（前面 li 默认出现，按右键依次显示带 fragment 的）
+  · 适用：列表逐条揭示、代码块分步出现、对比项依次展开。
+  · 禁止：标题、封面、章节页加 fragment。
+
+  五、演讲者备注 —— 可选
+
+  · 在任何 slide 内部用 <aside class="notes">备注文字</aside> 写演讲备注。
+  · 备注在普通视图不可见；按 S 键打开演示者模式时同步显示。
+  · 适用：提示要点、扩展说明、提醒切镜头/换语速等。
+
+  六、保真硬约束
+    · 用户原文 1:1 搬入，绝不改写、不增删、不润色、不重排；不做 Unicode 归一化。
+    · 不得插入原文不存在的标签；多行内容请拆为多个段落或多张 slide。
+    · 不得删除原文的装饰性元素；模板无 divider 组件时保留为字面字符。
+    · 不得把 markdown 语法当字面字符保留进渲染产物；语法标记应被对应 HTML 标签承载。
+
+  七、输出与交付
+    · 输出完整、可直接打开的 HTML（从 <!DOCTYPE html> 到 </html>）；本模板内所有未改动（包含冻结）的部分一律原样保留，绝不省略。
+    · 删除：本头部注释，以及所有 @as-slot / @as-component 注释。
+    · 保留：data-as-slot / data-as-component 属性。
+============================================================ -->
+
+<!-- @as-slot title
+  描述: 浏览器标签页标题
+  填充: 文本
+-->
+<title data-as-slot="title">示例 PPT 标题</title>
+
+<style>
+  :root{
+    --paper:#faf7f1; --ink:#23201b; --ink-soft:#5f584c;
+    --accent:#2f6b4f; --rule:#e7e1d5; --code-bg:#f2eee5;
+    --sans:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',system-ui,sans-serif;
+    --serif:'Songti SC','STSong','Source Han Serif SC',serif;
+    --mono:'SF Mono',ui-monospace,'Cascadia Code',Menlo,Consolas,monospace;
+    --h2:clamp(1.5em,2.4vw,2em);
+    --body:clamp(1em,1.4vw,1.2em);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;overflow:hidden;background:var(--paper);color:var(--ink);font-family:var(--sans)}
+
+  /* 幻灯片堆叠区 */
+  .deck{position:fixed;inset:0}
+  .slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;
+    padding:clamp(40px,6vw,96px) clamp(40px,8vw,140px);
+    opacity:0;pointer-events:none;transition:opacity .2s ease;overflow:hidden}
+  .slide.active{opacity:1;pointer-events:auto}
+  .slide h1,.slide h2{font-family:var(--serif);font-weight:600;margin:0 0 .5em;line-height:1.25}
+  .slide p{margin:.6em 0;line-height:1.7}
+  .slide ul,.slide ol{margin:.6em 0;padding-left:1.4em;line-height:1.8}
+  .slide li{margin:.3em 0}
+  .slide blockquote{font-family:var(--serif);font-style:italic;color:var(--ink-soft);
+    margin:1em 0;padding:.2em 0 .2em 1em;border-left:3px solid var(--accent)}
+  .slide pre{font-family:var(--mono);font-size:.85em;background:var(--code-bg);padding:14px 16px;
+    border-radius:8px;border:1px solid var(--rule);overflow:auto}
+  .slide code{font-family:var(--mono)}
+  .slide a{color:var(--accent)}
+
+  /* 通用：带下划线的页面标题（content/two-col/toc 复用） */
+  [data-as-component="slide-content"] h2,
+  [data-as-component="slide-two-col"] h2,
+  [data-as-component="slide-toc"] h2{font-size:var(--h2);padding-bottom:.25em;border-bottom:2px solid var(--accent);display:inline-block}
+
+  /* 居中类版式（cover/section/quote/end 复用） */
+  [data-as-component="slide-cover"],
+  [data-as-component="slide-section"],
+  [data-as-component="slide-quote"],
+  [data-as-component="slide-end"]{justify-content:center;text-align:center}
+
+  [data-as-component="slide-cover"] h1{font-size:clamp(2.2em,5vw,3.6em)}
+  [data-as-component="slide-cover"] .sub{font-size:clamp(1em,1.6vw,1.3em);color:var(--ink-soft);margin-top:.4em}
+  [data-as-component="slide-cover"] .meta{margin-top:2em;font-size:.95em;color:var(--ink-soft)}
+
+  [data-as-component="slide-section"]{background:var(--accent);color:#fff}
+  [data-as-component="slide-section"] h2{font-size:clamp(2em,4.5vw,3em);border:0;color:#fff}
+
+  [data-as-component="slide-content"]{font-size:var(--body)}
+
+  [data-as-component="slide-two-col"] .cols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,64px);margin-top:1em;flex:1;align-content:start}
+  [data-as-component="slide-two-col"] .col h3{font-family:var(--serif);font-size:1.2em;margin:0 0 .4em;color:var(--accent)}
+
+  [data-as-component="slide-end"] h2{font-size:clamp(2.5em,6vw,4em);border:0}
+
+  /* slide-image：满版图 */
+  [data-as-component="slide-image"]{padding:0;justify-content:flex-end}
+  [data-as-component="slide-image"] img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  /* 图注：右上角极简标签，半透明深色底打底确保各种图上都可读 */
+  [data-as-component="slide-image"] figcaption{position:absolute;top:clamp(24px,3vh,40px);right:clamp(24px,3vw,48px);
+    z-index:1;color:#fff;font-size:clamp(.8em,1vw,.92em);font-weight:500;
+    letter-spacing:.02em;max-width:50%;text-align:right;line-height:1.5;
+    background:rgba(0,0,0,.08);backdrop-filter:blur(6px);
+    padding:6px 12px;border-radius:6px}
+  /* 控制条在图片页：深色玻璃，避免白色气泡叠白图被吃掉 */
+  .ppt-ctrl.dark{background:rgba(0,0,0,.5);border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.85);opacity:.5}
+  .ppt-ctrl.dark:hover{opacity:1}
+  .ppt-ctrl.dark button{color:rgba(255,255,255,.85)}
+  .ppt-ctrl.dark button:hover{background:rgba(255,255,255,.12);color:#fff}
+
+  /* slide-quote：大字引用 */
+  [data-as-component="slide-quote"]{background:var(--code-bg)}
+  [data-as-component="slide-quote"] blockquote{font-family:var(--serif);font-style:italic;
+    font-size:clamp(1.5em,3vw,2.4em);line-height:1.5;color:var(--ink);
+    border:0;padding:0;margin:0 auto;max-width:80%}
+  [data-as-component="slide-quote"] .cite{display:block;margin-top:1.2em;font-style:normal;
+    font-family:var(--sans);font-size:clamp(.9em,1.3vw,1.1em);color:var(--ink-soft)}
+  [data-as-component="slide-quote"] .cite::before{content:'— '}
+
+  /* slide-toc：议程 */
+  [data-as-component="slide-toc"] ol{list-style:none;padding:0;margin:1.2em 0;counter-reset:toc;
+    font-size:clamp(1.1em,1.6vw,1.4em);line-height:2}
+  [data-as-component="slide-toc"] ol li{counter-increment:toc;padding-left:2.4em;position:relative}
+  [data-as-component="slide-toc"] ol li::before{content:counter(toc,decimal-leading-zero);
+    position:absolute;left:0;top:.35em;color:var(--accent);font-family:var(--mono);
+    font-weight:600;font-size:.85em}
+
+  /* 步进动画 / 备注 */
+  .fragment{opacity:0;transition:opacity .25s ease}
+  .fragment.visible{opacity:1}
+  .notes{display:none}
+
+  /* 进度条 */
+  .ppt-progress{position:fixed;top:0;left:0;right:0;height:3px;z-index:11;pointer-events:none}
+  .ppt-progress .bar{height:100%;background:var(--accent);width:0;transition:width .25s ease}
+
+  /* 控制条 */
+  .ppt-ctrl{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
+    display:flex;align-items:center;gap:6px;padding:6px 10px;
+    background:rgba(255,255,255,.8);backdrop-filter:blur(8px);
+    border:1px solid var(--rule);border-radius:999px;
+    font-size:13px;color:var(--ink-soft);user-select:none;z-index:10;
+    opacity:.3;transition:opacity .2s}
+  .ppt-ctrl:hover{opacity:1}
+  .ppt-ctrl button{background:none;border:0;cursor:pointer;color:inherit;font-size:14px;padding:2px 8px;border-radius:6px}
+  .ppt-ctrl button:hover{background:rgba(0,0,0,.06);color:var(--ink)}
+  .ppt-ctrl .page{min-width:54px;text-align:center;font-variant-numeric:tabular-nums}
+
+  /* 光标 / 黑白屏 */
+  body.cursor-hidden,body.cursor-hidden *{cursor:none!important}
+  .ppt-blank{position:fixed;inset:0;z-index:50;display:none}
+  .ppt-blank.on{display:block}
+  .ppt-blank.black{background:#000}
+  .ppt-blank.white{background:#fff}
+
+  /* 通用遮罩（overview/help 共享） */
+  .ppt-overlay{position:fixed;inset:0;z-index:40;display:none;overflow:auto;padding:32px}
+  .ppt-overlay.on{display:block}
+  .ppt-overview{background:rgba(35,32,27,.92)}
+  .ppt-help{background:rgba(35,32,27,.85);align-items:center;justify-content:center}
+  .ppt-help.on{display:flex}
+
+  /* 缩略图总览 */
+  .ppt-overview .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px;max-width:1400px;margin:0 auto}
+  .ppt-overview .thumb{position:relative;aspect-ratio:16/9;background:var(--paper);
+    border:2px solid transparent;border-radius:8px;overflow:hidden;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+  .ppt-overview .thumb:hover{border-color:#fff}
+  .ppt-overview .thumb.cur{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent)}
+  .ppt-overview .thumb .scale{position:absolute;top:0;left:0;width:1280px;height:720px;transform-origin:top left;pointer-events:none}
+  .ppt-overview .thumb .scale .slide{opacity:1!important;position:absolute;inset:0;width:1280px;height:720px}
+  .ppt-overview .thumb .num{position:absolute;left:6px;bottom:4px;color:var(--ink-soft);
+    background:rgba(255,255,255,.85);padding:1px 6px;border-radius:4px;font-size:11px}
+
+  /* 跳页输入提示 */
+  .ppt-jump{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:60;
+    background:rgba(0,0,0,.75);color:#fff;padding:18px 32px;border-radius:12px;
+    font-size:28px;font-family:var(--mono);display:none;letter-spacing:.1em}
+  .ppt-jump.on{display:block}
+
+  /* 帮助 */
+  .ppt-help .box{background:var(--paper);border-radius:12px;padding:28px 36px;max-width:520px;font-size:14px;line-height:1.8}
+  .ppt-help h3{margin:0 0 .8em;font-family:var(--serif);color:var(--accent)}
+  .ppt-help table{width:100%;border-collapse:collapse}
+  .ppt-help td{padding:4px 8px}
+  .ppt-help td:first-child{color:var(--accent);font-family:var(--mono);white-space:nowrap;width:1%}
+  .ppt-help .hint{margin-top:1em;font-size:12px;color:var(--ink-soft)}
+
+  /* 打印 */
+  @media print{
+    html,body{overflow:visible;height:auto}
+    .deck{position:static}
+    .slide{position:relative;inset:auto;opacity:1!important;pointer-events:auto;page-break-after:always;height:100vh;width:100vw}
+    .fragment{opacity:1!important}
+    .ppt-ctrl,.ppt-progress,.ppt-blank,.ppt-overlay,.ppt-jump{display:none!important}
+  }
+</style>
+</head>
+<body>
+
+<!-- @as-slot deck
+  描述: 幻灯片容器，按 DOM 顺序排列所有 slide-* 组件
+  填充: 组件
+-->
+<div class="deck" data-as-slot="deck">
+
+  <!-- ============================================================
+       ↓↓ 组件清单（同时也是 deck 槽的示例内容，渲染时被用户内容替换） ↓↓
+       ============================================================ -->
+
+  <!-- @as-component slide-cover
+    描述: 封面页（主标题 + 副标题 + 作者/日期）
+    布局: 块
+    适用: 演示的第一页
+    禁止: 中间章节(那用 slide-section)
+  -->
+  <section class="slide" data-as-component="slide-cover">
+    <h1>演示主标题</h1>
+    <p class="sub">这里是副标题或一句话简介</p>
+    <p class="meta">作者 · 2026.06.06</p>
+  </section>
+
+  <!-- @as-component slide-section
+    描述: 章节分隔页（一个大号章节标题，整页着色）
+    布局: 块
+    适用: 长演示(≥10 页)的章节切换
+    禁止: 当封面用(那用 slide-cover)；短演示中频繁使用
+  -->
+  <section class="slide" data-as-component="slide-section">
+    <h2>第一部分　背景与动机</h2>
+  </section>
+
+  <!-- @as-component slide-content
+    描述: 内容页（默认组件）：标题 + 自由正文
+    布局: 块
+    适用: 大多数页面；内容可含 p/ul/ol/blockquote/pre/code 等原生标签
+    禁止: 内容多到一屏装不下(请拆成多张)
+  -->
+  <section class="slide" data-as-component="slide-content">
+    <h2>这是一张内容页</h2>
+    <p>正文段落可以直接写。内容页里允许直接使用 HTML 原生标签承载文本，无需额外标记。</p>
+    <ul>
+      <li>要点一（默认出现）</li>
+      <li class="fragment">要点二（按一次 → 才出现，演示步进动画）</li>
+      <li class="fragment">要点三（再按一次出现）</li>
+    </ul>
+    <aside class="notes">这是演讲备注：提醒观众重点关注列表第二、三项；按 S 键查看本备注。</aside>
+  </section>
+
+  <!-- @as-component slide-two-col
+    描述: 双栏对照页（左右两列，可对比/并列展示）
+    布局: 块
+    适用: 对比、前后、优缺点、问题/答案
+    禁止: 单纯叙述(那用 slide-content)
+  -->
+  <section class="slide" data-as-component="slide-two-col">
+    <h2>左右对照</h2>
+    <div class="cols">
+      <div class="col">
+        <h3>左侧标题</h3>
+        <p>左侧内容，可放段落、列表等。</p>
+        <ul><li>左侧要点一</li><li>左侧要点二</li></ul>
+      </div>
+      <div class="col">
+        <h3>右侧标题</h3>
+        <p>右侧内容，与左侧形成对照。</p>
+        <ul><li>右侧要点一</li><li>右侧要点二</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- @as-component slide-toc
+    描述: 议程/目录页（带序号的章节列表）
+    布局: 块
+    适用: 封面后第二页，展示本次演示的主要章节
+    禁止: 当普通列表用(那用 slide-content 里的 ol)
+  -->
+  <section class="slide" data-as-component="slide-toc">
+    <h2>议程</h2>
+    <ol>
+      <li>背景与动机</li>
+      <li>核心方案</li>
+      <li>落地步骤</li>
+      <li>常见误区</li>
+    </ol>
+  </section>
+
+  <!-- @as-component slide-quote
+    描述: 整页大字引用（一段引文 + 出处）
+    布局: 块
+    适用: 关键引文、金句、煽情过渡页
+    禁止: 短引用(那用 slide-content 内嵌 blockquote)
+  -->
+  <section class="slide" data-as-component="slide-quote">
+    <blockquote>
+      我们淹没在信息里，却渴求着知识。
+      <span class="cite">约翰·奈斯比特</span>
+    </blockquote>
+  </section>
+
+  <!-- @as-component slide-image
+    描述: 满版图（图片占满整页，可选底部图注）
+    布局: 块
+    适用: 一张图是页面主角(截图、产品图、示意图)；文字仅作图注
+    禁止: 图旁要配大段文字(那用 slide-content 内嵌 figure，或 slide-two-col 一边放图)
+  -->
+  <section class="slide" data-as-component="slide-image">
+    <img src="https://picsum.photos/seed/ppt-sample/1600/900" alt="示例满版图">
+    <figcaption>图注：写在图片底部的简短说明（可省略）。</figcaption>
+  </section>
+
+  <!-- @as-component slide-end
+    描述: 结束页（一行大字，如 Thanks / Q&A）
+    布局: 块
+    适用: 演示最后一页
+    禁止: 当封面或章节页用
+  -->
+  <section class="slide" data-as-component="slide-end">
+    <h2>Thanks</h2>
+  </section>
+
+</div>
+
+<!-- 进度条 -->
+<div class="ppt-progress"><div class="bar"></div></div>
+
+<!-- 控制条 -->
+<div class="ppt-ctrl" role="toolbar" aria-label="PPT 控制条">
+  <button data-act="prev" title="上一页 (←)">‹</button>
+  <span class="page"><span class="cur">1</span> / <span class="total">1</span></span>
+  <button data-act="next" title="下一页 (→)">›</button>
+  <button data-act="play" title="播放 (P)">▶</button>
+  <button data-act="overview" title="总览 (O)">▦</button>
+  <button data-act="present" title="演示者模式 (S)">◫</button>
+  <button data-act="full" title="全屏 (F)">⛶</button>
+  <button data-act="help" title="帮助 (?)">?</button>
+</div>
+
+<!-- 遮罩 -->
+<div class="ppt-overlay ppt-overview" role="dialog" aria-label="幻灯片总览"><div class="grid"></div></div>
+<div class="ppt-blank"></div>
+<div class="ppt-jump"></div>
+<div class="ppt-overlay ppt-help" role="dialog" aria-label="快捷键帮助">
+  <div class="box">
+    <h3>快捷键</h3>
+    <table>
+      <tr><td>→ ↓ Space PageDown</td><td>下一步 / 下一页</td></tr>
+      <tr><td>← ↑ PageUp</td><td>上一步 / 上一页</td></tr>
+      <tr><td>Home / End</td><td>首页 / 末页</td></tr>
+      <tr><td>1-9 + Enter</td><td>输入数字跳页</td></tr>
+      <tr><td>F</td><td>全屏切换</td></tr>
+      <tr><td>P</td><td>自动播放</td></tr>
+      <tr><td>O</td><td>缩略图总览</td></tr>
+      <tr><td>S</td><td>演示者模式（新窗口）</td></tr>
+      <tr><td>B</td><td>黑屏切换</td></tr>
+      <tr><td>W</td><td>白屏切换</td></tr>
+      <tr><td>?</td><td>显示本帮助</td></tr>
+      <tr><td>Esc</td><td>退出当前遮罩 / 停止播放</td></tr>
+    </table>
+    <p class="hint">触屏：左右滑动翻页。URL 加 ?interval=3000&loop=1 控制自动播放。</p>
+  </div>
+</div>
+
+<!-- PPT 引擎 -->
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const slides = $$('.deck .slide');
+  if (!slides.length) return;
+
+  const params = new URLSearchParams(location.search);
+  const interval = +params.get('interval') || 5000;
+  const loop = params.get('loop') === '1';
+
+  const ctrl = $('.ppt-ctrl');
+  const curEl = $('.cur', ctrl);
+  const totalEl = $('.total', ctrl);
+  const playBtn = $('[data-act="play"]', ctrl);
+  const bar = $('.ppt-progress .bar');
+  const overview = $('.ppt-overview');
+  const overviewGrid = $('.grid', overview);
+  const blank = $('.ppt-blank');
+  const jumpEl = $('.ppt-jump');
+  const help = $('.ppt-help');
+  totalEl.textContent = slides.length;
+
+  let cur = 0, fragStep = 0, timer = null, presenter = null;
+  let cursorTimer, jumpBuf = '', jumpTimer;
+
+  const fragments = () => slides[cur].querySelectorAll('.fragment');
+  const applyFragments = () => fragments().forEach((f, i) => f.classList.toggle('visible', i < fragStep));
+  const updateProgress = () => {
+    const steps = fragments().length + 1;
+    bar.style.width = (cur + (fragStep + 1) / steps) / slides.length * 100 + '%';
+  };
+
+  const show = (i, resetFrag = true) => {
+    cur = Math.max(0, Math.min(slides.length - 1, i));
+    if (resetFrag) fragStep = 0;
+    slides.forEach((s, idx) => s.classList.toggle('active', idx === cur));
+    applyFragments();
+    curEl.textContent = cur + 1;
+    updateProgress();
+    // 图片页用深色控制条，避免白气泡叠图被吃
+    ctrl.classList.toggle('dark', slides[cur].dataset.asComponent === 'slide-image');
+    const hash = '#' + (cur + 1);
+    if (location.hash !== hash) history.replaceState(null, '', hash);
+    if (overview.classList.contains('on')) renderOverview();
+    syncPresenter();
+  };
+
+  const next = () => {
+    const fs = fragments();
+    if (fragStep < fs.length) { fragStep++; applyFragments(); updateProgress(); syncPresenter(); return; }
+    if (cur < slides.length - 1) show(cur + 1);
+    else if (loop) show(0);
+    else stop();
+  };
+
+  const prev = () => {
+    if (fragStep > 0) { fragStep--; applyFragments(); updateProgress(); syncPresenter(); return; }
+    if (cur > 0) {
+      cur--;
+      fragStep = slides[cur].querySelectorAll('.fragment').length;
+      show(cur, false);
+    }
+  };
+
+  const play = () => {
+    if (timer) return stop();
+    timer = setInterval(next, interval);
+    playBtn.textContent = '⏸';
+  };
+  const stop = () => { clearInterval(timer); timer = null; playBtn.textContent = '▶'; };
+
+  const full = () => document.fullscreenElement ? document.exitFullscreen?.() : document.documentElement.requestFullscreen?.();
+
+  const toggleBlank = (color) => {
+    const on = blank.classList.contains('on') && blank.classList.contains(color);
+    blank.className = 'ppt-blank' + (on ? '' : ' on ' + color);
+  };
+
+  const toggleOverview = () => overview.classList.toggle('on') && renderOverview();
+  const toggleHelp = () => help.classList.toggle('on');
+  const closeOverlays = () => {
+    overview.classList.remove('on');
+    help.classList.remove('on');
+    blank.className = 'ppt-blank';
+  };
+
+  const renderOverview = () => {
+    overviewGrid.innerHTML = '';
+    slides.forEach((s, i) => {
+      const thumb = document.createElement('div');
+      thumb.className = 'thumb' + (i === cur ? ' cur' : '');
+      thumb.innerHTML = `<div class="scale">${s.outerHTML}</div><div class="num">${i + 1}</div>`;
+      // 缩略图按容器宽度缩放：1280 → 实际宽度
+      requestAnimationFrame(() => {
+        const w = thumb.clientWidth || 240;
+        $('.scale', thumb).style.transform = `scale(${w / 1280})`;
+      });
+      thumb.onclick = () => { overview.classList.remove('on'); show(i); };
+      overviewGrid.appendChild(thumb);
+    });
+  };
+
+  const showJump = () => {
+    jumpEl.textContent = 'Go to: ' + jumpBuf;
+    jumpEl.classList.add('on');
+    clearTimeout(jumpTimer);
+    jumpTimer = setTimeout(() => { jumpEl.classList.remove('on'); jumpBuf = ''; }, 1500);
+  };
+  const commitJump = () => {
+    const n = +jumpBuf;
+    jumpBuf = ''; jumpEl.classList.remove('on');
+    if (n >= 1 && n <= slides.length) show(n - 1);
+  };
+
+  /* 演示者模式 */
+  const openPresenter = () => {
+    if (presenter && !presenter.closed) { presenter.focus(); return; }
+    presenter = window.open('', 'ppt-presenter', 'width=900,height=600');
+    if (!presenter) return;
+    presenter.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>演示者模式</title>
+<style>
+body{margin:0;font-family:system-ui,sans-serif;background:#1a1a1a;color:#eee;display:grid;grid-template-rows:1fr auto;height:100vh;overflow:hidden}
+.main{display:grid;grid-template-columns:2fr 1fr;gap:12px;padding:12px;overflow:hidden}
+.box{background:#2a2a2a;border-radius:8px;padding:12px;overflow:auto;display:flex;flex-direction:column}
+.box h4{margin:0 0 8px;color:#888;font-size:12px;text-transform:uppercase;letter-spacing:.1em}
+.preview{flex:1;background:#faf7f1;color:#23201b;border-radius:4px;padding:12px;overflow:hidden;font-size:11px}
+.preview .fragment{opacity:1!important}
+.notes-body{flex:1;font-size:14px;line-height:1.6;color:#ddd;white-space:pre-wrap}
+.bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#000;font-size:14px}
+.bar .timer{font-family:monospace;font-size:18px}
+.bar button{background:#444;color:#eee;border:0;padding:6px 12px;border-radius:4px;cursor:pointer;margin-left:6px}
+.bar button:hover{background:#666}
+</style></head><body>
+<div class="main">
+  <div class="box"><h4>当前页 <span id="pcur"></span> / <span id="ptotal">${slides.length}</span></h4><div class="preview" id="pnow"></div></div>
+  <div style="display:grid;grid-template-rows:1fr 1fr;gap:12px;overflow:hidden">
+    <div class="box"><h4>下一页</h4><div class="preview" id="pnext"></div></div>
+    <div class="box"><h4>备注</h4><div class="notes-body" id="pnotes"></div></div>
+  </div>
+</div>
+<div class="bar">
+  <span class="timer" id="ptimer">00:00</span>
+  <span><button id="pprev">←</button><button id="pnextb">→</button><button id="preset">重置计时</button></span>
+</div>
+</body></html>`);
+    presenter.document.close();
+    const pd = presenter.document;
+    let startTs = Date.now();
+    const tick = () => {
+      if (!presenter || presenter.closed) return;
+      const s = (Date.now() - startTs) / 1000 | 0;
+      pd.getElementById('ptimer').textContent = `${String(s / 60 | 0).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+      setTimeout(tick, 500);
+    };
+    tick();
+    pd.getElementById('preset').onclick = () => startTs = Date.now();
+    pd.getElementById('pprev').onclick = () => { prev(); window.focus(); };
+    pd.getElementById('pnextb').onclick = () => { next(); window.focus(); };
+    pd.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' || e.key === ' ') { next(); e.preventDefault(); }
+      else if (e.key === 'ArrowLeft') { prev(); e.preventDefault(); }
+    });
+    syncPresenter();
+  };
+
+  const syncPresenter = () => {
+    if (!presenter || presenter.closed) return;
+    const pd = presenter.document;
+    if (!pd.getElementById('pcur')) return;
+    pd.getElementById('pcur').textContent = cur + 1;
+    pd.getElementById('pnow').innerHTML = slides[cur].innerHTML;
+    pd.getElementById('pnext').innerHTML = slides[cur + 1]?.innerHTML || '<em style="color:#888">（最后一页）</em>';
+    const notes = slides[cur].querySelector('.notes');
+    pd.getElementById('pnotes').textContent = notes?.textContent.trim() || '（无备注）';
+  };
+
+  /* 光标自动隐藏 */
+  const bumpCursor = () => {
+    document.body.classList.remove('cursor-hidden');
+    clearTimeout(cursorTimer);
+    cursorTimer = setTimeout(() => document.body.classList.add('cursor-hidden'), 3000);
+  };
+  document.addEventListener('mousemove', bumpCursor);
+  bumpCursor();
+
+  /* 键盘 */
+  const keyMap = {
+    'ArrowRight': next, 'ArrowDown': next, ' ': next, 'PageDown': next,
+    'ArrowLeft': prev, 'ArrowUp': prev, 'PageUp': prev,
+    'Home': () => show(0), 'End': () => show(slides.length - 1),
+    'f': full, 'F': full, 'p': play, 'P': play,
+    'o': toggleOverview, 'O': toggleOverview,
+    's': openPresenter, 'S': openPresenter,
+    'b': () => toggleBlank('black'), 'B': () => toggleBlank('black'),
+    'w': () => toggleBlank('white'), 'W': () => toggleBlank('white'),
+    '?': toggleHelp, '/': toggleHelp,
+    'Escape': () => { closeOverlays(); stop(); },
+  };
+  const preventKeys = new Set(['ArrowRight', 'ArrowDown', ' ', 'PageDown', 'ArrowLeft', 'ArrowUp', 'PageUp']);
+
+  document.addEventListener('keydown', e => {
+    if (e.target.matches('input,textarea,select')) return;
+    if (/^[0-9]$/.test(e.key)) { jumpBuf += e.key; showJump(); return; }
+    if (e.key === 'Enter' && jumpBuf) { commitJump(); return; }
+    const fn = keyMap[e.key];
+    if (fn) { fn(); if (preventKeys.has(e.key)) e.preventDefault(); }
+  });
+
+  /* 控制条按钮（事件委托） */
+  const actMap = { prev, next, play, full, overview: toggleOverview, present: openPresenter, help: toggleHelp };
+  ctrl.addEventListener('click', e => {
+    const act = e.target.dataset.act;
+    if (actMap[act]) actMap[act]();
+  });
+
+  /* 点遮罩外部关闭 */
+  [help, overview].forEach(el => el.addEventListener('click', e => {
+    if (e.target === el) el.classList.remove('on');
+  }));
+  document.addEventListener('click', e => {
+    if (jumpBuf && !jumpEl.contains(e.target)) {
+      jumpBuf = ''; jumpEl.classList.remove('on'); clearTimeout(jumpTimer);
+    }
+  });
+
+  /* 触屏 */
+  let tx = 0, ty = 0;
+  document.addEventListener('touchstart', e => { tx = e.changedTouches[0].clientX; ty = e.changedTouches[0].clientY; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) dx < 0 ? next() : prev();
+  }, { passive: true });
+
+  /* URL hash 同步 */
+  const fromHash = () => {
+    const n = +location.hash.slice(1);
+    show(n >= 1 && n <= slides.length ? n - 1 : 0);
+  };
+  window.addEventListener('hashchange', fromHash);
+  fromHash();
+})();
+</script>
+
+</body>
+</html>

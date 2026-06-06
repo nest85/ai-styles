@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title data-as-slot="title">技术文档：从「写完」到「能用」</title>
+
+<style>
+  :root{
+    --paper:#faf7f1; --ink:#23201b; --ink-soft:#5f584c;
+    --accent:#2f6b4f; --rule:#e7e1d5; --code-bg:#f2eee5;
+    --sans:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',system-ui,sans-serif;
+    --serif:'Songti SC','STSong','Source Han Serif SC',serif;
+    --mono:'SF Mono',ui-monospace,'Cascadia Code',Menlo,Consolas,monospace;
+    --h2:clamp(1.5em,2.4vw,2em);
+    --body:clamp(1em,1.4vw,1.2em);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;overflow:hidden;background:var(--paper);color:var(--ink);font-family:var(--sans)}
+
+  /* 幻灯片堆叠区 */
+  .deck{position:fixed;inset:0}
+  .slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;
+    padding:clamp(40px,6vw,96px) clamp(40px,8vw,140px);
+    opacity:0;pointer-events:none;transition:opacity .2s ease;overflow:hidden}
+  .slide.active{opacity:1;pointer-events:auto}
+  .slide h1,.slide h2{font-family:var(--serif);font-weight:600;margin:0 0 .5em;line-height:1.25}
+  .slide p{margin:.6em 0;line-height:1.7}
+  .slide ul,.slide ol{margin:.6em 0;padding-left:1.4em;line-height:1.8}
+  .slide li{margin:.3em 0}
+  .slide blockquote{font-family:var(--serif);font-style:italic;color:var(--ink-soft);
+    margin:1em 0;padding:.2em 0 .2em 1em;border-left:3px solid var(--accent)}
+  .slide pre{font-family:var(--mono);font-size:.85em;background:var(--code-bg);padding:14px 16px;
+    border-radius:8px;border:1px solid var(--rule);overflow:auto}
+  .slide code{font-family:var(--mono)}
+  .slide a{color:var(--accent)}
+
+  /* 通用：带下划线的页面标题（content/two-col/toc 复用） */
+  [data-as-component="slide-content"] h2,
+  [data-as-component="slide-two-col"] h2,
+  [data-as-component="slide-toc"] h2{font-size:var(--h2);padding-bottom:.25em;border-bottom:2px solid var(--accent);display:inline-block}
+
+  /* 居中类版式（cover/section/quote/end 复用） */
+  [data-as-component="slide-cover"],
+  [data-as-component="slide-section"],
+  [data-as-component="slide-quote"],
+  [data-as-component="slide-end"]{justify-content:center;text-align:center}
+
+  [data-as-component="slide-cover"] h1{font-size:clamp(2.2em,5vw,3.6em)}
+  [data-as-component="slide-cover"] .sub{font-size:clamp(1em,1.6vw,1.3em);color:var(--ink-soft);margin-top:.4em}
+  [data-as-component="slide-cover"] .meta{margin-top:2em;font-size:.95em;color:var(--ink-soft)}
+
+  [data-as-component="slide-section"]{background:var(--accent);color:#fff}
+  [data-as-component="slide-section"] h2{font-size:clamp(2em,4.5vw,3em);border:0;color:#fff}
+
+  [data-as-component="slide-content"]{font-size:var(--body)}
+
+  [data-as-component="slide-two-col"] .cols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,64px);margin-top:1em;flex:1;align-content:start}
+  [data-as-component="slide-two-col"] .col h3{font-family:var(--serif);font-size:1.2em;margin:0 0 .4em;color:var(--accent)}
+
+  [data-as-component="slide-end"] h2{font-size:clamp(2.5em,6vw,4em);border:0}
+
+  /* slide-image：满版图 */
+  [data-as-component="slide-image"]{padding:0;justify-content:flex-end}
+  [data-as-component="slide-image"] img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  /* 图注：右上角极简标签，半透明深色底打底确保各种图上都可读 */
+  [data-as-component="slide-image"] figcaption{position:absolute;top:clamp(24px,3vh,40px);right:clamp(24px,3vw,48px);
+    z-index:1;color:#fff;font-size:clamp(.8em,1vw,.92em);font-weight:500;
+    letter-spacing:.02em;max-width:50%;text-align:right;line-height:1.5;
+    background:rgba(0,0,0,.08);backdrop-filter:blur(6px);
+    padding:6px 12px;border-radius:6px}
+  /* 控制条在图片页：深色玻璃，避免白色气泡叠白图被吃掉 */
+  .ppt-ctrl.dark{background:rgba(0,0,0,.5);border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.85);opacity:.5}
+  .ppt-ctrl.dark:hover{opacity:1}
+  .ppt-ctrl.dark button{color:rgba(255,255,255,.85)}
+  .ppt-ctrl.dark button:hover{background:rgba(255,255,255,.12);color:#fff}
+
+  /* slide-quote：大字引用 */
+  [data-as-component="slide-quote"]{background:var(--code-bg)}
+  [data-as-component="slide-quote"] blockquote{font-family:var(--serif);font-style:italic;
+    font-size:clamp(1.5em,3vw,2.4em);line-height:1.5;color:var(--ink);
+    border:0;padding:0;margin:0 auto;max-width:80%}
+  [data-as-component="slide-quote"] .cite{display:block;margin-top:1.2em;font-style:normal;
+    font-family:var(--sans);font-size:clamp(.9em,1.3vw,1.1em);color:var(--ink-soft)}
+  [data-as-component="slide-quote"] .cite::before{content:'— '}
+
+  /* slide-toc：议程 */
+  [data-as-component="slide-toc"] ol{list-style:none;padding:0;margin:1.2em 0;counter-reset:toc;
+    font-size:clamp(1.1em,1.6vw,1.4em);line-height:2}
+  [data-as-component="slide-toc"] ol li{counter-increment:toc;padding-left:2.4em;position:relative}
+  [data-as-component="slide-toc"] ol li::before{content:counter(toc,decimal-leading-zero);
+    position:absolute;left:0;top:.35em;color:var(--accent);font-family:var(--mono);
+    font-weight:600;font-size:.85em}
+
+  /* 步进动画 / 备注 */
+  .fragment{opacity:0;transition:opacity .25s ease}
+  .fragment.visible{opacity:1}
+  .notes{display:none}
+
+  /* 进度条 */
+  .ppt-progress{position:fixed;top:0;left:0;right:0;height:3px;z-index:11;pointer-events:none}
+  .ppt-progress .bar{height:100%;background:var(--accent);width:0;transition:width .25s ease}
+
+  /* 控制条 */
+  .ppt-ctrl{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
+    display:flex;align-items:center;gap:6px;padding:6px 10px;
+    background:rgba(255,255,255,.8);backdrop-filter:blur(8px);
+    border:1px solid var(--rule);border-radius:999px;
+    font-size:13px;color:var(--ink-soft);user-select:none;z-index:10;
+    opacity:.3;transition:opacity .2s}
+  .ppt-ctrl:hover{opacity:1}
+  .ppt-ctrl button{background:none;border:0;cursor:pointer;color:inherit;font-size:14px;padding:2px 8px;border-radius:6px}
+  .ppt-ctrl button:hover{background:rgba(0,0,0,.06);color:var(--ink)}
+  .ppt-ctrl .page{min-width:54px;text-align:center;font-variant-numeric:tabular-nums}
+
+  /* 光标 / 黑白屏 */
+  body.cursor-hidden,body.cursor-hidden *{cursor:none!important}
+  .ppt-blank{position:fixed;inset:0;z-index:50;display:none}
+  .ppt-blank.on{display:block}
+  .ppt-blank.black{background:#000}
+  .ppt-blank.white{background:#fff}
+
+  /* 通用遮罩（overview/help 共享） */
+  .ppt-overlay{position:fixed;inset:0;z-index:40;display:none;overflow:auto;padding:32px}
+  .ppt-overlay.on{display:block}
+  .ppt-overview{background:rgba(35,32,27,.92)}
+  .ppt-help{background:rgba(35,32,27,.85);align-items:center;justify-content:center}
+  .ppt-help.on{display:flex}
+
+  /* 缩略图总览 */
+  .ppt-overview .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px;max-width:1400px;margin:0 auto}
+  .ppt-overview .thumb{position:relative;aspect-ratio:16/9;background:var(--paper);
+    border:2px solid transparent;border-radius:8px;overflow:hidden;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+  .ppt-overview .thumb:hover{border-color:#fff}
+  .ppt-overview .thumb.cur{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent)}
+  .ppt-overview .thumb .scale{position:absolute;top:0;left:0;width:1280px;height:720px;transform-origin:top left;pointer-events:none}
+  .ppt-overview .thumb .scale .slide{opacity:1!important;position:absolute;inset:0;width:1280px;height:720px}
+  .ppt-overview .thumb .num{position:absolute;left:6px;bottom:4px;color:var(--ink-soft);
+    background:rgba(255,255,255,.85);padding:1px 6px;border-radius:4px;font-size:11px}
+
+  /* 跳页输入提示 */
+  .ppt-jump{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:60;
+    background:rgba(0,0,0,.75);color:#fff;padding:18px 32px;border-radius:12px;
+    font-size:28px;font-family:var(--mono);display:none;letter-spacing:.1em}
+  .ppt-jump.on{display:block}
+
+  /* 帮助 */
+  .ppt-help .box{background:var(--paper);border-radius:12px;padding:28px 36px;max-width:520px;font-size:14px;line-height:1.8}
+  .ppt-help h3{margin:0 0 .8em;font-family:var(--serif);color:var(--accent)}
+  .ppt-help table{width:100%;border-collapse:collapse}
+  .ppt-help td{padding:4px 8px}
+  .ppt-help td:first-child{color:var(--accent);font-family:var(--mono);white-space:nowrap;width:1%}
+  .ppt-help .hint{margin-top:1em;font-size:12px;color:var(--ink-soft)}
+
+  /* 打印 */
+  @media print{
+    html,body{overflow:visible;height:auto}
+    .deck{position:static}
+    .slide{position:relative;inset:auto;opacity:1!important;pointer-events:auto;page-break-after:always;height:100vh;width:100vw}
+    .fragment{opacity:1!important}
+    .ppt-ctrl,.ppt-progress,.ppt-blank,.ppt-overlay,.ppt-jump{display:none!important}
+  }
+
+  /* 本演示文稿额外样式：警告块、表格、图注 */
+  .admonition{margin:1em 0;padding:.8em 1.1em;border-left:4px solid;border-radius:6px;background:rgba(0,0,0,.03)}
+  .admonition.warning{border-color:#c9821b;background:#fbf3e2}
+  .admonition.important{border-color:var(--accent);background:#eaf3ed}
+  .admonition .label{display:block;font-weight:600;font-size:.85em;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.3em}
+  .admonition.warning .label{color:#c9821b}
+  .admonition.important .label{color:var(--accent)}
+  .slide table{width:100%;border-collapse:collapse;margin:.6em 0;font-size:.95em}
+  .slide table th,.slide table td{padding:.5em .8em;border-bottom:1px solid var(--rule);text-align:left}
+  .slide table th{font-family:var(--serif);color:var(--accent);border-bottom:2px solid var(--accent)}
+  .slide figure{margin:.6em 0;text-align:center}
+  .slide figure img{max-width:100%;max-height:42vh;border-radius:6px;border:1px solid var(--rule)}
+  .slide figure figcaption{font-size:.85em;color:var(--ink-soft);margin-top:.4em;font-style:italic}
+</style>
+</head>
+<body>
+
+<div class="deck" data-as-slot="deck">
+
+  <section class="slide" data-as-component="slide-cover">
+    <h1>技术文档：从「写完」到「能用」</h1>
+    <p class="sub">让你的文档真的被人读、被人用、被人改——而不是仓库角落里一份永远过期的 README。</p>
+    <p class="meta">作者：王某 · 2026.06</p>
+  </section>
+
+  <section class="slide" data-as-component="slide-toc">
+    <h2>议程</h2>
+    <ol>
+      <li>为什么文档总是没人看</li>
+      <li>三个核心原则</li>
+      <li>好文档 vs 坏文档</li>
+      <li>一段最小示例胜过千言</li>
+      <li>三个常见误区</li>
+      <li>工具不重要，习惯才重要</li>
+    </ol>
+  </section>
+
+  <section class="slide" data-as-component="slide-quote">
+    <blockquote>
+      写代码是给机器看的，写文档是给六个月后的自己看的。
+      <span class="cite">某个被自己旧代码坑过的人</span>
+    </blockquote>
+  </section>
+
+  <section class="slide" data-as-component="slide-content">
+    <h2>三个核心原则</h2>
+    <ul>
+      <li><strong>以读者为中心</strong>：先想"谁会读、带着什么问题读"，再决定写什么。</li>
+      <li><strong>场景化</strong>：用一个具体场景代替三段抽象描述。</li>
+      <li><strong>可执行</strong>：每段话读完，读者应该知道下一步做什么。</li>
+    </ul>
+    <figure>
+      <img src="https://picsum.photos/seed/principles/1200/600" alt="原则示意图：读者画像 → 场景 → 行动闭环">
+      <figcaption>图 1：好文档的三原则形成一个闭环。</figcaption>
+    </figure>
+  </section>
+
+  <section class="slide" data-as-component="slide-two-col">
+    <h2>好文档 vs 坏文档</h2>
+    <div class="cols">
+      <div class="col">
+        <h3>坏文档的样子</h3>
+        <ul>
+          <li>列了 API 字段，却不说怎么调用</li>
+          <li>说"请参考下文"，却不给跳转链接</li>
+          <li>大段抽象描述，没有一个例子</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h3>好文档的样子</h3>
+        <ul>
+          <li>给一个最小可运行的代码示例</li>
+          <li>引用精准到行号，能点击跳转</li>
+          <li>用具体场景说明"什么时候用、什么时候别用"</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-as-component="slide-content">
+    <h2>一段最小示例胜过千言</h2>
+    <p>文档里最该出现的，是这种「贴上就能跑」的代码：</p>
+    <pre><code>curl -X POST https://api.example.com/v1/users \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"name":"Alice"}'</code></pre>
+    <p>读者把 <code>$TOKEN</code> 替换成自己的就能验证——比十段"如何认证"的描述都管用。</p>
+    <figure>
+      <img src="https://picsum.photos/seed/workflow/1400/700" alt="文档写作流程：写 → 用 → 反馈 → 改">
+      <figcaption>图 2：文档不是写完就完事，而是「写 → 用 → 反馈 → 改」的循环。</figcaption>
+    </figure>
+  </section>
+
+  <section class="slide" data-as-component="slide-image">
+    <img src="https://picsum.photos/seed/messy-desk/1920/1080" alt="乱糟糟的办公桌特写：纸张、咖啡杯、便利贴">
+    <figcaption>现场调研：堆满未读资料、笔记和便利贴的真实办公桌。</figcaption>
+  </section>
+
+  <section class="slide" data-as-component="slide-content">
+    <h2>三个常见误区</h2>
+    <div class="admonition warning">
+      <span class="label">⚠ Warning</span>
+      <p><strong>追求完整性</strong>：试图覆盖所有边界情况，结果谁都没耐心看完。</p>
+    </div>
+    <div class="admonition warning">
+      <span class="label">⚠ Warning</span>
+      <p><strong>只更新代码不更新文档</strong>：6 个月后文档已经全是骗人的。</p>
+    </div>
+    <div class="admonition warning">
+      <span class="label">⚠ Warning</span>
+      <p><strong>闭门造车</strong>：写完不让任何人试读就上线，结果新人看了一头雾水。</p>
+    </div>
+  </section>
+
+  <section class="slide" data-as-component="slide-content">
+    <h2>工具对比</h2>
+    <p>挑工具的优先级：<strong>能用就好，别让选型本身成为不写文档的借口。</strong></p>
+    <table>
+      <thead>
+        <tr><th>工具</th><th>适合场景</th><th>学习成本</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Markdown</td><td>任何项目，跟代码一起版本化</td><td>低</td></tr>
+        <tr><td>Notion</td><td>团队协作、内部知识库</td><td>中</td></tr>
+        <tr><td>GitBook</td><td>对外的产品文档</td><td>中</td></tr>
+        <tr><td>Docusaurus</td><td>大型开源项目站点</td><td>高</td></tr>
+      </tbody>
+    </table>
+    <figure>
+      <img src="https://picsum.photos/seed/tools/1200/500" alt="四个工具的 logo 拼版">
+      <figcaption>图 3：四款常见文档工具。挑一个开始，比纠结哪个最好更重要。</figcaption>
+    </figure>
+  </section>
+
+  <section class="slide" data-as-component="slide-content">
+    <h2>小结</h2>
+    <div class="admonition important">
+      <span class="label">★ Important</span>
+      <p>文档不是"写完就完事"的一次性产物，而是和代码一样需要<strong>持续维护、迭代、贴近用户</strong>——开始写、坚持改、让人真的用上，比一开始就选对工具重要得多。</p>
+    </div>
+  </section>
+
+  <section class="slide" data-as-component="slide-end">
+    <h2>Thanks</h2>
+    <p style="font-size:clamp(1em,1.6vw,1.3em);color:var(--ink-soft);margin-top:1em">开始写 · 坚持改 · 让人用</p>
+  </section>
+
+</div>
+
+<!-- 进度条 -->
+<div class="ppt-progress"><div class="bar"></div></div>
+
+<!-- 控制条 -->
+<div class="ppt-ctrl" role="toolbar" aria-label="PPT 控制条">
+  <button data-act="prev" title="上一页 (←)">‹</button>
+  <span class="page"><span class="cur">1</span> / <span class="total">1</span></span>
+  <button data-act="next" title="下一页 (→)">›</button>
+  <button data-act="play" title="播放 (P)">▶</button>
+  <button data-act="overview" title="总览 (O)">▦</button>
+  <button data-act="present" title="演示者模式 (S)">◫</button>
+  <button data-act="full" title="全屏 (F)">⛶</button>
+  <button data-act="help" title="帮助 (?)">?</button>
+</div>
+
+<!-- 遮罩 -->
+<div class="ppt-overlay ppt-overview" role="dialog" aria-label="幻灯片总览"><div class="grid"></div></div>
+<div class="ppt-blank"></div>
+<div class="ppt-jump"></div>
+<div class="ppt-overlay ppt-help" role="dialog" aria-label="快捷键帮助">
+  <div class="box">
+    <h3>快捷键</h3>
+    <table>
+      <tr><td>→ ↓ Space PageDown</td><td>下一步 / 下一页</td></tr>
+      <tr><td>← ↑ PageUp</td><td>上一步 / 上一页</td></tr>
+      <tr><td>Home / End</td><td>首页 / 末页</td></tr>
+      <tr><td>1-9 + Enter</td><td>输入数字跳页</td></tr>
+      <tr><td>F</td><td>全屏切换</td></tr>
+      <tr><td>P</td><td>自动播放</td></tr>
+      <tr><td>O</td><td>缩略图总览</td></tr>
+      <tr><td>S</td><td>演示者模式（新窗口）</td></tr>
+      <tr><td>B</td><td>黑屏切换</td></tr>
+      <tr><td>W</td><td>白屏切换</td></tr>
+      <tr><td>?</td><td>显示本帮助</td></tr>
+      <tr><td>Esc</td><td>退出当前遮罩 / 停止播放</td></tr>
+    </table>
+    <p class="hint">触屏：左右滑动翻页。URL 加 ?interval=3000&loop=1 控制自动播放。</p>
+  </div>
+</div>
+
+<!-- PPT 引擎 -->
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const slides = $$('.deck .slide');
+  if (!slides.length) return;
+
+  const params = new URLSearchParams(location.search);
+  const interval = +params.get('interval') || 5000;
+  const loop = params.get('loop') === '1';
+
+  const ctrl = $('.ppt-ctrl');
+  const curEl = $('.cur', ctrl);
+  const totalEl = $('.total', ctrl);
+  const playBtn = $('[data-act="play"]', ctrl);
+  const bar = $('.ppt-progress .bar');
+  const overview = $('.ppt-overview');
+  const overviewGrid = $('.grid', overview);
+  const blank = $('.ppt-blank');
+  const jumpEl = $('.ppt-jump');
+  const help = $('.ppt-help');
+  totalEl.textContent = slides.length;
+
+  let cur = 0, fragStep = 0, timer = null, presenter = null;
+  let cursorTimer, jumpBuf = '', jumpTimer;
+
+  const fragments = () => slides[cur].querySelectorAll('.fragment');
+  const applyFragments = () => fragments().forEach((f, i) => f.classList.toggle('visible', i < fragStep));
+  const updateProgress = () => {
+    const steps = fragments().length + 1;
+    bar.style.width = (cur + (fragStep + 1) / steps) / slides.length * 100 + '%';
+  };
+
+  const show = (i, resetFrag = true) => {
+    cur = Math.max(0, Math.min(slides.length - 1, i));
+    if (resetFrag) fragStep = 0;
+    slides.forEach((s, idx) => s.classList.toggle('active', idx === cur));
+    applyFragments();
+    curEl.textContent = cur + 1;
+    updateProgress();
+    // 图片页用深色控制条，避免白气泡叠图被吃
+    ctrl.classList.toggle('dark', slides[cur].dataset.asComponent === 'slide-image');
+    const hash = '#' + (cur + 1);
+    if (location.hash !== hash) history.replaceState(null, '', hash);
+    if (overview.classList.contains('on')) renderOverview();
+    syncPresenter();
+  };
+
+  const next = () => {
+    const fs = fragments();
+    if (fragStep < fs.length) { fragStep++; applyFragments(); updateProgress(); syncPresenter(); return; }
+    if (cur < slides.length - 1) show(cur + 1);
+    else if (loop) show(0);
+    else stop();
+  };
+
+  const prev = () => {
+    if (fragStep > 0) { fragStep--; applyFragments(); updateProgress(); syncPresenter(); return; }
+    if (cur > 0) {
+      cur--;
+      fragStep = slides[cur].querySelectorAll('.fragment').length;
+      show(cur, false);
+    }
+  };
+
+  const play = () => {
+    if (timer) return stop();
+    timer = setInterval(next, interval);
+    playBtn.textContent = '⏸';
+  };
+  const stop = () => { clearInterval(timer); timer = null; playBtn.textContent = '▶'; };
+
+  const full = () => document.fullscreenElement ? document.exitFullscreen?.() : document.documentElement.requestFullscreen?.();
+
+  const toggleBlank = (color) => {
+    const on = blank.classList.contains('on') && blank.classList.contains(color);
+    blank.className = 'ppt-blank' + (on ? '' : ' on ' + color);
+  };
+
+  const toggleOverview = () => overview.classList.toggle('on') && renderOverview();
+  const toggleHelp = () => help.classList.toggle('on');
+  const closeOverlays = () => {
+    overview.classList.remove('on');
+    help.classList.remove('on');
+    blank.className = 'ppt-blank';
+  };
+
+  const renderOverview = () => {
+    overviewGrid.innerHTML = '';
+    slides.forEach((s, i) => {
+      const thumb = document.createElement('div');
+      thumb.className = 'thumb' + (i === cur ? ' cur' : '');
+      thumb.innerHTML = `<div class="scale">${s.outerHTML}</div><div class="num">${i + 1}</div>`;
+      // 缩略图按容器宽度缩放：1280 → 实际宽度
+      requestAnimationFrame(() => {
+        const w = thumb.clientWidth || 240;
+        $('.scale', thumb).style.transform = `scale(${w / 1280})`;
+      });
+      thumb.onclick = () => { overview.classList.remove('on'); show(i); };
+      overviewGrid.appendChild(thumb);
+    });
+  };
+
+  const showJump = () => {
+    jumpEl.textContent = 'Go to: ' + jumpBuf;
+    jumpEl.classList.add('on');
+    clearTimeout(jumpTimer);
+    jumpTimer = setTimeout(() => { jumpEl.classList.remove('on'); jumpBuf = ''; }, 1500);
+  };
+  const commitJump = () => {
+    const n = +jumpBuf;
+    jumpBuf = ''; jumpEl.classList.remove('on');
+    if (n >= 1 && n <= slides.length) show(n - 1);
+  };
+
+  /* 演示者模式 */
+  const openPresenter = () => {
+    if (presenter && !presenter.closed) { presenter.focus(); return; }
+    presenter = window.open('', 'ppt-presenter', 'width=900,height=600');
+    if (!presenter) return;
+    presenter.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>演示者模式</title>
+<style>
+body{margin:0;font-family:system-ui,sans-serif;background:#1a1a1a;color:#eee;display:grid;grid-template-rows:1fr auto;height:100vh;overflow:hidden}
+.main{display:grid;grid-template-columns:2fr 1fr;gap:12px;padding:12px;overflow:hidden}
+.box{background:#2a2a2a;border-radius:8px;padding:12px;overflow:auto;display:flex;flex-direction:column}
+.box h4{margin:0 0 8px;color:#888;font-size:12px;text-transform:uppercase;letter-spacing:.1em}
+.preview{flex:1;background:#faf7f1;color:#23201b;border-radius:4px;padding:12px;overflow:hidden;font-size:11px}
+.preview .fragment{opacity:1!important}
+.notes-body{flex:1;font-size:14px;line-height:1.6;color:#ddd;white-space:pre-wrap}
+.bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#000;font-size:14px}
+.bar .timer{font-family:monospace;font-size:18px}
+.bar button{background:#444;color:#eee;border:0;padding:6px 12px;border-radius:4px;cursor:pointer;margin-left:6px}
+.bar button:hover{background:#666}
+</style></head><body>
+<div class="main">
+  <div class="box"><h4>当前页 <span id="pcur"></span> / <span id="ptotal">${slides.length}</span></h4><div class="preview" id="pnow"></div></div>
+  <div style="display:grid;grid-template-rows:1fr 1fr;gap:12px;overflow:hidden">
+    <div class="box"><h4>下一页</h4><div class="preview" id="pnext"></div></div>
+    <div class="box"><h4>备注</h4><div class="notes-body" id="pnotes"></div></div>
+  </div>
+</div>
+<div class="bar">
+  <span class="timer" id="ptimer">00:00</span>
+  <span><button id="pprev">←</button><button id="pnextb">→</button><button id="preset">重置计时</button></span>
+</div>
+</body></html>`);
+    presenter.document.close();
+    const pd = presenter.document;
+    let startTs = Date.now();
+    const tick = () => {
+      if (!presenter || presenter.closed) return;
+      const s = (Date.now() - startTs) / 1000 | 0;
+      pd.getElementById('ptimer').textContent = `${String(s / 60 | 0).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+      setTimeout(tick, 500);
+    };
+    tick();
+    pd.getElementById('preset').onclick = () => startTs = Date.now();
+    pd.getElementById('pprev').onclick = () => { prev(); window.focus(); };
+    pd.getElementById('pnextb').onclick = () => { next(); window.focus(); };
+    pd.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' || e.key === ' ') { next(); e.preventDefault(); }
+      else if (e.key === 'ArrowLeft') { prev(); e.preventDefault(); }
+    });
+    syncPresenter();
+  };
+
+  const syncPresenter = () => {
+    if (!presenter || presenter.closed) return;
+    const pd = presenter.document;
+    if (!pd.getElementById('pcur')) return;
+    pd.getElementById('pcur').textContent = cur + 1;
+    pd.getElementById('pnow').innerHTML = slides[cur].innerHTML;
+    pd.getElementById('pnext').innerHTML = slides[cur + 1]?.innerHTML || '<em style="color:#888">（最后一页）</em>';
+    const notes = slides[cur].querySelector('.notes');
+    pd.getElementById('pnotes').textContent = notes?.textContent.trim() || '（无备注）';
+  };
+
+  /* 光标自动隐藏 */
+  const bumpCursor = () => {
+    document.body.classList.remove('cursor-hidden');
+    clearTimeout(cursorTimer);
+    cursorTimer = setTimeout(() => document.body.classList.add('cursor-hidden'), 3000);
+  };
+  document.addEventListener('mousemove', bumpCursor);
+  bumpCursor();
+
+  /* 键盘 */
+  const keyMap = {
+    'ArrowRight': next, 'ArrowDown': next, ' ': next, 'PageDown': next,
+    'ArrowLeft': prev, 'ArrowUp': prev, 'PageUp': prev,
+    'Home': () => show(0), 'End': () => show(slides.length - 1),
+    'f': full, 'F': full, 'p': play, 'P': play,
+    'o': toggleOverview, 'O': toggleOverview,
+    's': openPresenter, 'S': openPresenter,
+    'b': () => toggleBlank('black'), 'B': () => toggleBlank('black'),
+    'w': () => toggleBlank('white'), 'W': () => toggleBlank('white'),
+    '?': toggleHelp, '/': toggleHelp,
+    'Escape': () => { closeOverlays(); stop(); },
+  };
+  const preventKeys = new Set(['ArrowRight', 'ArrowDown', ' ', 'PageDown', 'ArrowLeft', 'ArrowUp', 'PageUp']);
+
+  document.addEventListener('keydown', e => {
+    if (e.target.matches('input,textarea,select')) return;
+    if (/^[0-9]$/.test(e.key)) { jumpBuf += e.key; showJump(); return; }
+    if (e.key === 'Enter' && jumpBuf) { commitJump(); return; }
+    const fn = keyMap[e.key];
+    if (fn) { fn(); if (preventKeys.has(e.key)) e.preventDefault(); }
+  });
+
+  /* 控制条按钮（事件委托） */
+  const actMap = { prev, next, play, full, overview: toggleOverview, present: openPresenter, help: toggleHelp };
+  ctrl.addEventListener('click', e => {
+    const act = e.target.dataset.act;
+    if (actMap[act]) actMap[act]();
+  });
+
+  /* 点遮罩外部关闭 */
+  [help, overview].forEach(el => el.addEventListener('click', e => {
+    if (e.target === el) el.classList.remove('on');
+  }));
+  document.addEventListener('click', e => {
+    if (jumpBuf && !jumpEl.contains(e.target)) {
+      jumpBuf = ''; jumpEl.classList.remove('on'); clearTimeout(jumpTimer);
+    }
+  });
+
+  /* 触屏 */
+  let tx = 0, ty = 0;
+  document.addEventListener('touchstart', e => { tx = e.changedTouches[0].clientX; ty = e.changedTouches[0].clientY; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) dx < 0 ? next() : prev();
+  }, { passive: true });
+
+  /* URL hash 同步 */
+  const fromHash = () => {
+    const n = +location.hash.slice(1);
+    show(n >= 1 && n <= slides.length ? n - 1 : 0);
+  };
+  window.addEventListener('hashchange', fromHash);
+  fromHash();
+})();
+</script>
+
+</body>
+</html>
