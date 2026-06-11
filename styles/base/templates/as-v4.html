@@ -3,20 +3,22 @@
 <!-- @as-protocol
   模板名称: AI Styles Complex Test Template
   任务目标: 使用已声明组件，在 data-as-slot 槽位内渲染用户内容；
-  元素标记:
-    data-as-slot="name" = 槽位，AI 可填充，位置固定；对应 @as-slot name 的注释。
-    data-as-component="name" = 组件，AI 可复用；对应 @as-component name 的注释。
+  元素标记与绑定:
+    data-as-slot="name" = 槽位，AI 可填充，位置固定；绑定 @as-slot name 的注释。
+    data-as-component="name" = 组件，AI 可复用；绑定 @as-component name 的注释。
     data-as-lock="true" = 锁定区，AI 不可修改，原样渲染；
+    注意：元素与注释的绑定靠 name 匹配，不靠物理位置；
+
   渲染规则:
-    0. 渲染前先检查每个元素的属性约束再决定能不能动；
-    1. 仅允许替换各 data-as-slot 元素的内部内容，data-as-slot 元素本身必须原样保留；
-    2. 仅在 data-as-slot 内使用已声明 data-as-component 组件；
-    3. 无法确定 data-as-component 组件时，使用默认组件；
-    4. 允许修改 data-as-component 组件正常使用所需内容和属性，如 img.src、img.alt、figcaption、a.href、文本内容；
-    5. 禁止自创组件、class、style、data-* 属性；
-    6. 没有 data-as-* 标记的元素必须原样渲染；
-    7. data-as-lock="true" 标记的元素及内容必须原样渲染；
-    8. 用户原文必须 1:1 保留，不改写、不增删、不润色、不重排；
+    1. 渲染前先检查每个元素的属性约束再决定能不能动；
+    2. 仅允许替换各 data-as-slot 元素的内部内容，data-as-slot 元素本身必须原样保留；
+    3. 仅在 data-as-slot 内使用已声明 data-as-component 组件；
+    4. 无法确定 data-as-component 组件时，使用默认组件；
+    5. 允许修改 data-as-component 组件正常使用所需内容和属性，如 img.src、img.alt、figcaption、a.href、文本内容；
+    6. 禁止自创组件、class、style、data-* 属性；
+    7. 没有 data-as-* 标记的元素必须原样渲染；
+    8. data-as-lock="true" 标记的元素及内容禁止任何修改，必须原样渲染；
+    9. 用户原文必须 1:1 保留，不改写、不增删、不润色、不重排；
   输出要求:
     1. 删除所有 @as-* 控制注释；
     2. 保留所有元素的 data-as-* 属性；
@@ -234,10 +236,10 @@
 <nav class="as-toc"></nav>
 
 <!-- @as-slot eyebrow
-  描述: 文章上方的小标签
+  描述: 文章主题分类小标签
   填充: 文本
-  适用：主标题上的小标签
-  禁止：作为标题
+  适用：文章主题分类
+  禁止：作为文章标题、作者等
 -->
 <p class="eyebrow" data-as-slot="eyebrow">示例内容</p>
 
